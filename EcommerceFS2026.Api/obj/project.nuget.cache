@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "Tvedr7Sfd5E=",
-  "success": true,
+  "dgSpecHash": "ph98ZPKX3ok=",
+  "success": false,
   "projectFilePath": "E:\\Proyectos\\EcommerceFS2026\\EcommerceFS2026.Api\\EcommerceFS2026.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\thiag\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
@@ -55,5 +55,17 @@
     "C:\\Users\\thiag\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.22\\microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512",
     "C:\\Users\\thiag\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.22\\microsoft.netcore.app.host.win-x64.8.0.22.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1102",
+      "level": "Error",
+      "message": "No se encuentra el paquete MercadoPago con la versión (>= 2.3.0)\r\n  - Versiones encontradas en nuget.org: 1 [ versión más cercana: 1.0.4477.31589 ]\r\n  - Versiones encontradas en Microsoft Visual Studio Offline Packages: 0",
+      "projectPath": "E:\\Proyectos\\EcommerceFS2026\\EcommerceFS2026.Api\\EcommerceFS2026.Api.csproj",
+      "filePath": "E:\\Proyectos\\EcommerceFS2026\\EcommerceFS2026.Api\\EcommerceFS2026.Api.csproj",
+      "libraryId": "MercadoPago",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

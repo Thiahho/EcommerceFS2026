@@ -2733,6 +2733,7 @@
     "net8.0": [
       "EcommerceFS2026.Application >= 1.0.0",
       "EcommerceFS2026.Infrastructure >= 1.0.0",
+      "MercadoPago >= 2.3.0",
       "Microsoft.EntityFrameworkCore >= 8.0.0",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.0",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 8.0.0",
@@ -2796,6 +2797,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "MercadoPago": {
+            "target": "Package",
+            "version": "[2.3.0, )"
+          },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",
             "version": "[8.0.0, )"
@@ -2855,5 +2860,16 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1102",
+      "level": "Error",
+      "message": "No se encuentra el paquete MercadoPago con la versión (>= 2.3.0)\r\n  - Versiones encontradas en nuget.org: 1 [ versión más cercana: 1.0.4477.31589 ]\r\n  - Versiones encontradas en Microsoft Visual Studio Offline Packages: 0",
+      "libraryId": "MercadoPago",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }
