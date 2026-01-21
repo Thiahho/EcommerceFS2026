@@ -19,6 +19,11 @@ public class JwtTokenService
 
     public (string Token, DateTimeOffset ExpiresAt) CreateToken(User user)
     {
+        if (Encoding.UTF8.GetBytes(_settings.SigningKey).Length < 32)
+        {
+            throw new InvalidOperationException("La clave JWT debe tener al menos 32 caracteres (256 bits).");
+        }
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SigningKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expiresAt = DateTimeOffset.UtcNow.AddMinutes(_settings.ExpirationMinutes);
