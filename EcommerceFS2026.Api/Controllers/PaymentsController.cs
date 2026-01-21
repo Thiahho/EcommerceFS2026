@@ -2,16 +2,23 @@ using EcommerceFS2026.Api.Models.Payments;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Domain.Enums;
 using EcommerceFS2026.Infrastructure.Data;
-using MercadoPago.Client.PaymentMethod;
+
+using MercadoPago.Client;
 using MercadoPago.Client.Payment;
+using MercadoPago.Client.PaymentMethod;
 using MercadoPago.Client.Preference;
 using MercadoPago.Config;
+
 using MercadoPago.Resource;
-using MercadoPago.Resource.PaymentMethod;
 using MercadoPago.Resource.Payment;
 using MercadoPago.Resource.Preference;
+
+// Alias para evitar ambigüedad
+using MpPaymentMethod = MercadoPago.Resource.PaymentMethod.PaymentMethod;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace EcommerceFS2026.Api.Controllers;
 
@@ -29,22 +36,22 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("methods")]
-    public async Task<IActionResult> GetPaymentMethods(CancellationToken cancellationToken)
-    {
-        var accessToken = _configuration["MercadoPago:AccessToken"];
+public async Task<IActionResult> GetPaymentMethods(CancellationToken cancellationToken)
+{
+    var accessToken = _configuration["MercadoPago:AccessToken"];
+    if (string.IsNullOrWhiteSpace(accessToken))
+        return BadRequest("Falta configurar MercadoPago:AccessToken.");
 
-        if (string.IsNullOrWhiteSpace(accessToken))
-        {
-            return BadRequest("Falta configurar MercadoPago:AccessToken.");
-        }
+    MercadoPagoConfig.AccessToken = accessToken;
 
-        MercadoPagoConfig.AccessToken = accessToken;
+    var requestOptions = new RequestOptions { AccessToken = accessToken };
 
-        var client = new PaymentMethodClient();
-        ResourcesList<PaymentMethod> paymentMethods = await client.ListAsync(cancellationToken);
+    var client = new PaymentMethodClient();
+    ResourcesList<MpPaymentMethod> paymentMethods = await client.ListAsync(requestOptions);
 
-        return Ok(paymentMethods);
-    }
+    return Ok(paymentMethods);
+}
+
 
     [HttpPost("preference")]
     public async Task<IActionResult> CreatePreference(
@@ -83,8 +90,11 @@ public class PaymentsController : ControllerBase
             }
         };
 
+       var requestOptions = new RequestOptions { AccessToken = accessToken };
+
         var client = new PreferenceClient();
-        Preference preference = await client.CreateAsync(preferenceRequest, cancellationToken);
+        Preference preference = await client.CreateAsync(preferenceRequest, requestOptions);
+
 
         return Ok(new { preference.Id });
     }
@@ -116,8 +126,11 @@ public class PaymentsController : ControllerBase
             }
         };
 
+        var requestOptions = new RequestOptions { AccessToken = accessToken };
+
         var client = new PaymentClient();
-        Payment payment = await client.CreateAsync(paymentRequest, cancellationToken);
+        Payment payment = await client.CreateAsync(paymentRequest, requestOptions);
+
 
         var order = await _dbContext.Orders
             .Include(o => o.Items)

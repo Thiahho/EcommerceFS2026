@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("product_variants")]
 public class ProductVariant : Entity
 {
-    [Column("product_id")]
+    [Column("id")]
     public Guid ProductId { get; set; }
     [Column("color")]
     public string Color { get; set; } = string.Empty;

@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("product_images")]
 public class ProductImage : Entity
 {
-    [Column("product_id")]
+    [Column("id")]
     public Guid ProductId { get; set; }
     [Column("url")]
     public string Url { get; set; } = string.Empty;

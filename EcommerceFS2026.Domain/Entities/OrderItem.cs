@@ -5,7 +5,7 @@ namespace EcommerceFS2026.Domain.Entities;
 [Table("order_items")]
 public class OrderItem : Entity
 {
-    [Column("order_id")]
+    [Column("id")]
     public Guid OrderId { get; set; }
 
     [Column("product_variant_id")]

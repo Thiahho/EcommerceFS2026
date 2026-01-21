@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("Products")]
@@ -9,9 +11,10 @@ public class Product : Entity
     public string Name { get; set; } = string.Empty;
     [Column("description")]
     public string Description { get; set; } = string.Empty;
-    [Column("brand")]
+    [Column("category_id")]
     public Guid CategoryId { get; set; }
-
+    [Column("brand")]
+    public string Brand { get; set; } = string.Empty;
     [Column("slug")]
     public string Slug { get; set; } = string.Empty;
     [Column("active")]

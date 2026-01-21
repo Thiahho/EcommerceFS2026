@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using EcommerceFS2026.Domain.Enums;
 
 namespace EcommerceFS2026.Domain.Entities;
@@ -17,6 +18,8 @@ public class StockReservation : Entity
     public DateTimeOffset CreatedAt { get; set; }
     [Column("updated_at")]
     public DateTimeOffset UpdatedAt { get; set; }
+    [Column("expires_at")]
+    public DateTimeOffset ExpiresAt { get; set; }
 
     public StockReservationStatus Status { get; set; } = StockReservationStatus.Active;
 

@@ -6,6 +6,9 @@ namespace EcommerceFS2026.Domain.Entities;
 [Table("orders")]
 public class Order : Entity
 {
+    [Column("id")]
+    public Guid Id{get;set;}
+    
     [Column("customer_name")]
     public string CustomerName { get; set; } = string.Empty;
 
