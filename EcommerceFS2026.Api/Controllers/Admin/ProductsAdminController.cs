@@ -1,12 +1,14 @@
 using EcommerceFS2026.Api.Models.Admin;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceFS2026.Api.Controllers.Admin;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/products")]
 public class ProductsAdminController : ControllerBase
 {
@@ -18,6 +20,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Vendedor")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var products = await _dbContext.Products
@@ -30,6 +33,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(AdminProductRequest request, CancellationToken cancellationToken)
     {
         var categoryExists = await _dbContext.Categories
@@ -57,6 +61,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, AdminProductRequest request, CancellationToken cancellationToken)
     {
         var product = await _dbContext.Products
@@ -81,6 +86,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var product = await _dbContext.Products

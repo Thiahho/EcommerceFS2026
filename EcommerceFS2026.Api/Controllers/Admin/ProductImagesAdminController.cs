@@ -1,12 +1,14 @@
 using EcommerceFS2026.Api.Models.Admin;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceFS2026.Api.Controllers.Admin;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/images")]
 public class ProductImagesAdminController : ControllerBase
 {
@@ -18,6 +20,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpPost("product/{productId:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(Guid productId, AdminProductImageRequest request, CancellationToken cancellationToken)
     {
         var productExists = await _dbContext.Products
@@ -44,6 +47,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin,Vendedor")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var image = await _dbContext.ProductImages
@@ -59,6 +63,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, AdminProductImageRequest request, CancellationToken cancellationToken)
     {
         var image = await _dbContext.ProductImages
@@ -81,6 +86,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var image = await _dbContext.ProductImages

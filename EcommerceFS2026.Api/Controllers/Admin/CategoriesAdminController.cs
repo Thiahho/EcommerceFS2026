@@ -1,12 +1,14 @@
 using EcommerceFS2026.Api.Models.Admin;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceFS2026.Api.Controllers.Admin;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/categories")]
 public class CategoriesAdminController : ControllerBase
 {
@@ -18,6 +20,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Vendedor")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var categories = await _dbContext.Categories
@@ -29,6 +32,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(AdminCategoryRequest request, CancellationToken cancellationToken)
     {
         var category = new Category
@@ -45,6 +49,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, AdminCategoryRequest request, CancellationToken cancellationToken)
     {
         var category = await _dbContext.Categories
@@ -66,6 +71,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var category = await _dbContext.Categories

@@ -1,12 +1,14 @@
 using EcommerceFS2026.Api.Models.Admin;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceFS2026.Api.Controllers.Admin;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/variants")]
 public class ProductVariantsAdminController : ControllerBase
 {
@@ -18,6 +20,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpPost("product/{productId:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(Guid productId, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var productExists = await _dbContext.Products
@@ -48,6 +51,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin,Vendedor")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
@@ -63,6 +67,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
@@ -89,6 +94,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
