@@ -1,3 +1,4 @@
+using MercadoPago.Client;
 using MercadoPago.Client.PaymentMethod;
 using MercadoPago.Config;
 using MercadoPago.Resource;
@@ -18,19 +19,21 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("methods")]
-    public async Task<IActionResult> GetPaymentMethods(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetPaymentMethods()
     {
         var accessToken = _configuration["MercadoPago:AccessToken"];
-
         if (string.IsNullOrWhiteSpace(accessToken))
-        {
             return BadRequest("Falta configurar MercadoPago:AccessToken.");
-        }
 
         MercadoPagoConfig.AccessToken = accessToken;
 
+        var requestOptions = new RequestOptions
+        {
+            AccessToken = accessToken
+        };
+
         var client = new PaymentMethodClient();
-        ResourcesList<PaymentMethod> paymentMethods = await client.ListAsync(cancellationToken);
+        ResourcesList<PaymentMethod> paymentMethods = await client.ListAsync(requestOptions);
 
         return Ok(paymentMethods);
     }
