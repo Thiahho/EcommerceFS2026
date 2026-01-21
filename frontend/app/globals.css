@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg: #f8f5f2;
+  --text: #0f172a;
+  --accent: #2b7a78;
+  --accent-strong: #ff7a59;
+  --muted: #64748b;
+  --card: #ffffff;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-feature-settings: "ss01" 1, "ss02" 1, "ss03" 1;
+}
+
+.section-title {
+  @apply text-2xl font-semibold text-ink;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+}
+
+.card {
+  @apply rounded-3xl bg-white p-6 shadow-soft;
+}
