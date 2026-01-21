@@ -48,6 +48,24 @@ para el ecommerce de productos tecnológicos (teléfonos, notebooks, parlantes, 
 - `AltText` (opcional)
 - `PublicId` (opcional si se usa CDN)
 
+**Promocion**
+
+- `Id` (PK)
+- `Nombre`
+- `Descripcion`
+- `Tipo` (Porcentaje)
+- `Valor`
+- `Codigo` (opcional, si aplica)
+- `FechaInicio`, `FechaFin`
+- `Activa`
+- `CreatedAt`, `UpdatedAt`
+- `Combinable` (false por defecto)
+
+**PromocionProducto** (relación)
+
+- `PromocionId` (FK)
+- `ProductoId` (FK)
+
 **Usuario**
 
 - `Id` (PK)
@@ -95,7 +113,7 @@ para el ecommerce de productos tecnológicos (teléfonos, notebooks, parlantes, 
 - `PedidoId` (FK, nullable hasta confirmar checkout)
 - `Cantidad`
 - `ExpiraEn`
-- `Estado` (Activa, Confirmada, Expirada)
+- `Estado` (Activa, Consumida, Expirada)
 - `CreatedAt`
 
 **Comprobante**
@@ -117,6 +135,7 @@ para el ecommerce de productos tecnológicos (teléfonos, notebooks, parlantes, 
 
 - Producto 1..n VarianteProducto
 - Producto 1..n ImagenProducto
+- Producto n..m Promocion (via PromocionProducto)
 - Pedido 1..n PedidoDetalle
 - VarianteProducto 1..n ReservaStock
 - Pedido 0..1 Comprobante
@@ -130,11 +149,11 @@ para el ecommerce de productos tecnológicos (teléfonos, notebooks, parlantes, 
 ### 2.1 Compra con pago (checkout estándar)
 
 1. Cliente agrega variante al carrito.
-2. Checkout inicia reserva de stock (15–20 min).
+2. Checkout inicia reserva de stock (15 min).
 3. Se crea preferencia en Mercado Pago.
 4. Cliente paga.
 5. Webhook confirma pago.
-6. Reserva pasa a `Confirmada` y se descuenta stock definitivo.
+6. Reserva pasa a `Consumida` y se descuenta stock definitivo.
 7. Pedido cambia a `Pagado`.
 8. Se genera comprobante PDF interno.
 9. Se notifica por email y se habilita botón WhatsApp.
@@ -171,6 +190,8 @@ Pagado -> Cancelado (solo admin en casos excepcionales)
 - `GET /products` (listado con filtros)
 - `GET /products/{slug}` (detalle)
 - `GET /products/{id}/variants` (variantes disponibles)
+- `GET /promotions` (catálogo de promos activas)
+- `GET /promotions/{id}` (detalle de promo)
 
 ### 4.2 Carrito y checkout
 
@@ -196,6 +217,12 @@ Pagado -> Cancelado (solo admin en casos excepcionales)
 - `POST /auth/login`
 - `POST /auth/register` (solo cliente)
 - `GET /me`
+
+### 4.6 Promociones (reglas MVP)
+
+- Promos solo **por producto**.
+- Solo **porcentajes**.
+- **No combinables**.
 
 ---
 
@@ -261,16 +288,17 @@ Pagado -> Cancelado (solo admin en casos excepcionales)
 ### Reglas
 
 - Crear reserva al iniciar checkout.
-- Expiración automática si no se confirma pago.
-- Confirmar reserva al recibir webhook de pago.
+- Expiración automática si no se confirma pago (15 min).
+- Confirmar reserva al recibir webhook de pago y convertir a consumo definitivo.
 
 ### Pseudoflujo
 
 1. `POST /checkout` crea reservas por variante.
 2. Se registra `ExpiraEn` (ahora + 15 min).
-3. Webhook `payment.success` confirma reserva.
-4. Se descuenta `StockActual` y se marca reserva como `Confirmada`.
+3. Webhook `payment.success` consume reserva.
+4. Se descuenta `StockActual` y se marca reserva como `Consumida`.
 5. Si expira, se marca como `Expirada` y se libera.
+6. Registrar movimiento de stock tipo `SALE` al consumir reserva.
 
 ---
 
@@ -325,6 +353,17 @@ https://wa.me/54XXXXXXXXXX?text=Hola,%20quiero%20coordinar%20mi%20pedido%20#TRK-
   1. Backend genera un `signed upload` (URL segura).
   2. Frontend sube la imagen directo al proveedor.
   3. Se guarda la `Url` en `ImagenProducto`.
+
+---
+
+## 9.1 Datos mínimos de envío (MVP)
+
+- Nombre y apellido
+- DNI
+- Teléfono
+- Dirección
+- Localidad
+- Código postal
 
 ---
 
@@ -393,3 +432,129 @@ src/lib/ (api client, zod schemas, utils)
 src/stores/ (zustand)
 src/services/ (requests: products, cart, orders)
 src/hooks/ (hooks propios)
+
+---
+
+## 13) Arquitectura recomendada (MVP y escalable)
+
+### 13.1 Enfoque inicial (MVP)
+
+- **Monolito modular** con límites claros por dominio (DDD ligero + Clean Architecture).
+- Capas:
+  - **API** (Controllers/Endpoints)
+  - **Application** (casos de uso)
+  - **Domain** (entidades, reglas)
+  - **Infrastructure** (EF Core, integraciones)
+- Beneficios: rápida entrega, bajo costo operativo, fácil de escalar horizontalmente.
+
+### 13.2 Evolución (fase 2)
+
+- Separar módulos críticos si crece la operación:
+  - **Payments** y **Orders** como servicios aislables.
+  - **Catálogo** con cache y búsqueda dedicada.
+- Mantener contratos mediante eventos (outbox + colas).
+
+---
+
+## 14) Stack backend recomendado (alineado a tu .NET 8)
+
+### 14.1 Stack base
+
+- **.NET 8 + ASP.NET Core Web API**
+- **EF Core 8** (PostgreSQL en prod, SQLite en dev)
+- **JWT + Refresh Tokens**
+- **Serilog** (logs estructurados)
+- **HealthChecks UI**
+
+### 14.2 Integraciones
+
+- **Mercado Pago** (API + webhooks firmados)
+- **MailKit** (emails transaccionales)
+- **HubSpot** (post-compra)
+- **GA4** (eventos frontend)
+
+---
+
+## 15) Estructura lógica y funcional (MVP)
+
+### 15.1 Módulos
+
+1. **Catálogo**
+   - productos, categorías, variantes, imágenes
+2. **Carrito**
+   - agregar, actualizar, eliminar
+3. **Checkout**
+   - reserva stock + preferencia MP
+4. **Pagos**
+   - webhook MP + confirmación
+5. **Pedidos**
+   - estados + tracking
+6. **Usuarios y roles**
+   - admin / vendedor / cliente
+7. **Notificaciones**
+   - email + WhatsApp
+8. **Admin**
+   - gestión catálogo, stock, pedidos
+9. **Promociones**
+   - catálogo de promos, reglas y vigencia
+
+### 15.2 Permisos sugeridos
+
+- **Admin**: todo.
+- **Vendedor**: catálogo + stock + pedidos (sin costos/ganancias ni reportes de ventas).
+- **Cliente**: compras y tracking.
+
+---
+
+## 16) Buenas prácticas de seguridad y compliance
+
+- Validaciones server-side + sanitización.
+- Rate limiting en login y checkout.
+- Webhooks firmados y verificados.
+- Encriptar secretos con Secret Manager.
+- Auditoría de cambios de stock y precios.
+- Rotación de tokens y revocación.
+
+---
+
+## 17) Testing recomendado
+
+- **Unit tests** (dominio y casos de uso).
+- **Integration tests** (API + DB).
+- **E2E** para checkout (Playwright).
+- **Contract tests** básicos para webhooks.
+
+---
+
+## 18) DevOps y despliegue
+
+- **CI/CD**: GitHub Actions
+  - build + tests
+  - lint + format
+  - deploy automático (staging/prod)
+- **Infra**:
+  - Backend en Render (demo) y Hostinger + AlmaLinux (prod)
+  - DB PostgreSQL administrado
+  - Storage imágenes: Cloudinary/S3
+
+---
+
+## 19) Roadmap sugerido
+
+### Fase 1 (MVP operativo)
+
+1. Catálogo + variantes + stock
+2. Checkout + reservas
+3. Mercado Pago + webhook
+4. Pedidos + tracking
+5. Admin básico
+6. Email + WhatsApp
+7. GA4
+
+### Fase 2 (escalado)
+
+1. Integración logística (Andreani)
+2. Facturación AFIP + PDF
+3. Carrito abandonado (HubSpot)
+4. Importación masiva
+5. RMA / devoluciones
