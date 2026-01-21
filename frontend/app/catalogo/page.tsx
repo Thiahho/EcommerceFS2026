@@ -14,19 +14,26 @@ export default function CatalogPage() {
   const [promo, setPromo] = useState(false);
   const [stock, setStock] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const data = await fetchCatalog({
-        brand: brand || undefined,
-        category: category || undefined,
-        minPrice: minPrice || undefined,
-        maxPrice: maxPrice || undefined,
-        hasPromotion: promo ? 'true' : undefined,
-        inStock: stock ? 'true' : undefined
-      } as Record<string, string>);
-      setProducts(data);
+      setError('');
+      try {
+        const data = await fetchCatalog({
+          brand: brand || undefined,
+          category: category || undefined,
+          minPrice: minPrice || undefined,
+          maxPrice: maxPrice || undefined,
+          hasPromotion: promo ? 'true' : undefined,
+          inStock: stock ? 'true' : undefined
+        } as Record<string, string>);
+        setProducts(data);
+      } catch (err) {
+        console.error('Error cargando catálogo:', err);
+        setError('No pudimos cargar el catálogo. Verificá que el backend esté en http://localhost:5000.');
+      }
       setLoading(false);
     }
 
@@ -121,6 +128,8 @@ export default function CatalogPage() {
         <div className="space-y-6">
           {loading ? (
             <div className="card">Cargando catálogo...</div>
+          ) : error ? (
+            <div className="card text-sm text-rose-600">{error}</div>
           ) : (
             <div className="grid gap-6 md:grid-cols-3">
               {products.map((product) => (
