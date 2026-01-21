@@ -21,5 +21,6 @@ public class StockReservation : Entity
     [Column("status")]
     public StockReservationStatus Status { get; set; } = StockReservationStatus.Active;
 
+    public Order? Order { get; set; }
     public ProductVariant? ProductVariant { get; set; }
 }

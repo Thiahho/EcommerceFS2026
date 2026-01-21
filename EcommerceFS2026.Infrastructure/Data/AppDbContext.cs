@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Promotion> Promotions => Set<Promotion>();
     public DbSet<PromotionProduct> PromotionProducts => Set<PromotionProduct>();
     public DbSet<StockReservation> StockReservations => Set<StockReservation>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +49,16 @@ public class AppDbContext : DbContext
             .HasOne(pp => pp.Product)
             .WithMany(p => p.PromotionProducts)
             .HasForeignKey(pp => pp.ProductId);
+
+        modelBuilder.Entity<OrderItem>()
+            .HasOne(item => item.Order)
+            .WithMany(order => order.Items)
+            .HasForeignKey(item => item.OrderId);
+
+        modelBuilder.Entity<OrderItem>()
+            .HasOne(item => item.ProductVariant)
+            .WithMany()
+            .HasForeignKey(item => item.ProductVariantId);
 
         base.OnModelCreating(modelBuilder);
     }
