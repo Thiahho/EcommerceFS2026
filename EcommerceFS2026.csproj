@@ -16,7 +16,5 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DrCell.Application\DrCell.Application.csproj" />
-    <ProjectReference Include="..\DrCell.Infrastructure\DrCell.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

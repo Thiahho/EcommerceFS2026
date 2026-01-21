@@ -1,8 +1,8 @@
-using DrCell.Infrastructure.Data;
+using EcommerceFS2026.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace DrCell.Api.Controllers;
+namespace EcommerceFS2026.Controllers;
 
 [ApiController]
 [Route("api/products")]

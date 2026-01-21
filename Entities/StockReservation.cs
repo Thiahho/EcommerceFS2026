@@ -1,6 +1,6 @@
-using DrCell.Domain.Enums;
+using EcommerceFS2026.Enums;
 
-namespace DrCell.Domain.Entities;
+namespace EcommerceFS2026.Entities;
 
 public class StockReservation : Entity
 {

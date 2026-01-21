@@ -1,4 +1,4 @@
-namespace DrCell.Domain.Entities;
+namespace EcommerceFS2026.Entities;
 
 public abstract class Entity
 {

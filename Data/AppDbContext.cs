@@ -1,7 +1,7 @@
-using DrCell.Domain.Entities;
+using EcommerceFS2026.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace DrCell.Infrastructure.Data;
+namespace EcommerceFS2026.Data;
 
 public class AppDbContext : DbContext
 {

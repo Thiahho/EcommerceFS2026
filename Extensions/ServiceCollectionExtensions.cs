@@ -1,9 +1,9 @@
-using DrCell.Infrastructure.Data;
+using EcommerceFS2026.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DrCell.Infrastructure.Extensions;
+namespace EcommerceFS2026.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
