@@ -18,7 +18,7 @@ public class Promotion : Entity
     public decimal Value { get; set; }
     [Column("code")]
     public string? Code { get; set; }
-    [Column("created_at")]
+    [Column("starts_at")]
     public DateTimeOffset StartsAt { get; set; }
     [Column("ends_at")]
     public DateTimeOffset EndsAt { get; set; }

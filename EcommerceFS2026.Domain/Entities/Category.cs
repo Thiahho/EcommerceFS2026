@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace EcommerceFS2026.Domain.Entities;
 
-[Table("Categories")]
+[Table("categories")]
 public class Category : Entity
 {
 

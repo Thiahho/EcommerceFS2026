@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EcommerceFS2026.Domain.Entities;
 
-[Table("Products")]
+[Table("products")]
 public class Product : Entity
 {
     [Column("id")]
