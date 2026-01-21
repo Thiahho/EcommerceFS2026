@@ -18,7 +18,26 @@ builder.Services.AddScoped<IPasswordHasher<EcommerceFS2026.Domain.Entities.User>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>() ?? new JwtSettings();
+        var jwtSettings = builder.Configuration
+            .GetSection("Jwt")
+            .Get<JwtSettings>() ?? new JwtSettings();
+
+        if (string.IsNullOrWhiteSpace(jwtSettings.SigningKey))
+            throw new InvalidOperationException("Missing Jwt:SigningKey.");
+
+        byte[] keyBytes;
+        try
+        {
+            keyBytes = Convert.FromBase64String(jwtSettings.SigningKey);
+        }
+        catch
+        {
+            keyBytes = Encoding.UTF8.GetBytes(jwtSettings.SigningKey);
+        }
+
+        if (keyBytes.Length < 32)
+            throw new InvalidOperationException("Jwt:SigningKey must be at least 32 bytes for HS256.");
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -27,9 +46,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SigningKey))
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+            ClockSkew = TimeSpan.Zero
         };
     });
+
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
