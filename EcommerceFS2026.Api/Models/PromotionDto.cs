@@ -5,6 +5,6 @@ public record PromotionDto(
     string Name,
     string Description,
     decimal Value,
-    DateTimeOffset StartsAt,
+    DateTimeOffset CreatedAt,
     DateTimeOffset EndsAt
 );

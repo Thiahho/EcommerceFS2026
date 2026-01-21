@@ -8,7 +8,7 @@ public record AdminPromotionRequest(
     PromotionType Type,
     decimal Value,
     string? Code,
-    DateTimeOffset StartsAt,
+    DateTimeOffset CreatedAt,
     DateTimeOffset EndsAt,
     bool Active,
     bool Combinable);
