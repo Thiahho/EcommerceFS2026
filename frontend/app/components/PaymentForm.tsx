@@ -3,6 +3,7 @@
 import Script from 'next/script';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCart } from '../hooks/useCart';
+import { createPreference } from '../lib/api';
 
 type MercadoPagoInstance = {
   fields: {
@@ -26,6 +27,13 @@ type MercadoPagoInstance = {
     bin: string;
     paymentTypeId: string;
   }) => Promise<Array<{ payer_costs: Array<any> }>>;
+  bricks: () => {
+    create: (
+      brick: string,
+      containerId: string,
+      settings: { initialization: { preferenceId: string } }
+    ) => Promise<void>;
+  };
 };
 
 type MpWindow = Window & {
@@ -40,8 +48,43 @@ export default function PaymentForm() {
   const expirationRef = useRef<ReturnType<MercadoPagoInstance['fields']['create']> | null>(null);
   const securityCodeRef = useRef<ReturnType<MercadoPagoInstance['fields']['create']> | null>(null);
   const [message, setMessage] = useState('');
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
 
   const transactionAmount = useMemo(() => total.toFixed(2), [total]);
+  const backUrls = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return {
+      success: `${origin}/checkout/success`,
+      failure: `${origin}/checkout/failure`,
+      pending: `${origin}/checkout/pending`
+    };
+  }, []);
+
+  useEffect(() => {
+    async function loadPreference() {
+      try {
+        if (!items.length) {
+          return;
+        }
+        const payload = {
+          items: items.map((item) => ({
+            title: item.name,
+            quantity: item.quantity,
+            currencyId: 'ARS',
+            unitPrice: item.price
+          })),
+          backUrls
+        };
+        const result = await createPreference(payload);
+        setPreferenceId(result.id);
+      } catch (error) {
+        console.error('error creating preference: ', error);
+        setMessage('No se pudo crear la preferencia de pago.');
+      }
+    }
+
+    loadPreference();
+  }, [items, backUrls]);
 
   useEffect(() => {
     if (!mpReady) {
@@ -204,6 +247,20 @@ export default function PaymentForm() {
     }
   }, [mpReady, transactionAmount]);
 
+  useEffect(() => {
+    async function renderWallet() {
+      if (!mpReady || !mpRef.current || !preferenceId) {
+        return;
+      }
+      const bricksBuilder = mpRef.current.bricks();
+      await bricksBuilder.create('wallet', 'walletBrick_container', {
+        initialization: { preferenceId }
+      });
+    }
+
+    renderWallet();
+  }, [mpReady, preferenceId]);
+
   if (!items.length) {
     return (
       <div className="card">
@@ -229,6 +286,14 @@ export default function PaymentForm() {
       />
 
       {message && <div className="rounded-2xl bg-rose-100 px-4 py-3 text-sm text-rose-700">{message}</div>}
+
+      <section className="card space-y-4">
+        <h2 className="text-lg font-semibold text-ink">Checkout Pro (Mercado Pago)</h2>
+        <p className="text-sm text-slate-600">
+          Si querés pagar con checkout redirigido, usá el botón de Mercado Pago.
+        </p>
+        <div id="walletBrick_container" />
+      </section>
 
       <form
         id="form-checkout"

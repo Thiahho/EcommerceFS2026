@@ -26,3 +26,20 @@ export async function fetchProductDetail(slug: string) {
 
   return (await response.json()) as ProductDetail;
 }
+
+export async function createPreference(payload: {
+  items: Array<{ title: string; quantity: number; currencyId: string; unitPrice: number }>;
+  backUrls: { success: string; failure: string; pending: string };
+}) {
+  const response = await fetch(`${baseUrl}/api/payments/preference`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    throw new Error('No se pudo crear la preferencia de pago.');
+  }
+
+  return (await response.json()) as { id: string };
+}
