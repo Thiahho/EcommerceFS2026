@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EcommerceFS2026.Api.Controllers.Admin;
 
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 [Route("api/admin/promotions")]
 public class PromotionsAdminController : ControllerBase
 {
@@ -20,6 +20,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Vendedor")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var promotions = await _dbContext.Promotions
@@ -31,6 +32,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(AdminPromotionRequest request, CancellationToken cancellationToken)
     {
         var promotion = new Promotion
@@ -53,6 +55,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, AdminPromotionRequest request, CancellationToken cancellationToken)
     {
         var promotion = await _dbContext.Promotions
@@ -80,6 +83,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpPost("{id:guid}/products")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AssignProduct(Guid id, AdminAssignPromotionProductRequest request, CancellationToken cancellationToken)
     {
         var promotionExists = await _dbContext.Promotions
@@ -112,6 +116,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpDelete("{id:guid}/products/{productId:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RemoveProduct(Guid id, Guid productId, CancellationToken cancellationToken)
     {
         var relation = await _dbContext.PromotionProducts

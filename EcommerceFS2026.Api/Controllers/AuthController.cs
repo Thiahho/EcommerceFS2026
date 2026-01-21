@@ -36,8 +36,17 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken)
     {
+        var hasUsers = await _dbContext.Users.AnyAsync(cancellationToken);
+
+        if (hasUsers && !User.IsInRole("Admin"))
+        {
+            return Forbid();
+        }
+
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var role = string.IsNullOrWhiteSpace(request.Role) ? "Admin" : request.Role.Trim();
+        var role = hasUsers
+            ? (string.IsNullOrWhiteSpace(request.Role) ? "Vendedor" : request.Role.Trim())
+            : "Admin";
 
         if (!AllowedRoles.Contains(role))
         {
