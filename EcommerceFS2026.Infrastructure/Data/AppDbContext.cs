@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<StockReservation> StockReservations => Set<StockReservation>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +36,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ProductVariant>(entity =>
         {
             entity.HasIndex(v => v.Sku).IsUnique();
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasIndex(u => u.Email).IsUnique();
         });
 
         modelBuilder.Entity<PromotionProduct>()

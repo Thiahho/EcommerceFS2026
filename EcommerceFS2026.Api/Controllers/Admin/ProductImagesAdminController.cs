@@ -1,12 +1,14 @@
 using EcommerceFS2026.Api.Models.Admin;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceFS2026.Api.Controllers.Admin;
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/admin/images")]
 public class ProductImagesAdminController : ControllerBase
 {
