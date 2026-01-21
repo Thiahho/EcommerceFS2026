@@ -77,3 +77,32 @@ CREATE TABLE IF NOT EXISTS stock_reservations (
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NULL
 );
+
+CREATE TABLE IF NOT EXISTS orders (
+    id UUID PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    customer_email TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_dni TEXT NOT NULL,
+    shipping_address TEXT NOT NULL,
+    shipping_city TEXT NOT NULL,
+    shipping_postal_code TEXT NOT NULL,
+    status INT NOT NULL,
+    currency TEXT NOT NULL,
+    total_amount NUMERIC(18,2) NOT NULL,
+    payment_provider TEXT NULL,
+    payment_status TEXT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NULL
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id UUID PRIMARY KEY,
+    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_variant_id UUID NOT NULL REFERENCES product_variants(id) ON DELETE CASCADE,
+    product_name TEXT NOT NULL,
+    unit_price NUMERIC(18,2) NOT NULL,
+    quantity INT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NULL
+);
