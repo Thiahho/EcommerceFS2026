@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ProductDetail } from '../lib/types';
 import { useCart } from '../hooks/useCart';
 
 export default function ProductDetailClient({ product }: { product: ProductDetail }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
   const images = product.images.length ? product.images : [];
@@ -83,20 +85,34 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
             type="button"
             className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
             onClick={() =>
-              addItem({
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                variantId: selectedVariant.id,
-                variantLabel: `${selectedVariant.color} / ${selectedVariant.ram} / ${selectedVariant.storage}`,
-                price: selectedVariant.price,
-                quantity
-              })
+              {
+                addItem({
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  variantId: selectedVariant.id,
+                  variantLabel: `${selectedVariant.color} / ${selectedVariant.ram} / ${selectedVariant.storage}`,
+                  price: selectedVariant.price,
+                  quantity
+                });
+                setAdded(true);
+              }
             }
           >
             Agregar al carrito
           </button>
         </div>
+        {added && (
+          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+            <span>Producto agregado al carrito.</span>
+            <Link href="/carrito" className="font-semibold text-moss">
+              Ir al carrito
+            </Link>
+            <Link href="/checkout" className="font-semibold text-ink">
+              Finalizar compra
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
