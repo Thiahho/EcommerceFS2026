@@ -57,12 +57,12 @@ export default function CartPage() {
               >
                 Vaciar carrito
               </button>
-              <button
-                type="button"
+              <Link
+                href="/checkout"
                 className="rounded-full bg-ink px-5 py-2 text-xs font-semibold text-white"
               >
                 Continuar
-              </button>
+              </Link>
             </div>
           </div>
         </div>

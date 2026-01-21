@@ -29,3 +29,13 @@ body {
 .card {
   @apply rounded-3xl bg-white p-6 shadow-soft;
 }
+
+.container {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--card);
+  border-radius: 16px;
+  padding: 0 12px;
+  background: #ffffff;
+}

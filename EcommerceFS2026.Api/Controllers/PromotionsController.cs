@@ -23,13 +23,13 @@ public class PromotionsController : ControllerBase
 
         var promotions = await _dbContext.Promotions
             .AsNoTracking()
-            .Where(promotion => promotion.Active && promotion.CreatedAt <= now && promotion.EndsAt >= now)
+            .Where(promotion => promotion.Active && promotion.StartsAt <= now && promotion.EndsAt >= now)
             .Select(promotion => new PromotionDto(
                 promotion.Id,
                 promotion.Name,
                 promotion.Description,
                 promotion.Value,
-                promotion.CreatedAt,
+                promotion.StartsAt,
                 promotion.EndsAt))
             .ToListAsync(cancellationToken);
 

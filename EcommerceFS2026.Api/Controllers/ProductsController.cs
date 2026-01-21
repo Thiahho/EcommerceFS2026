@@ -67,7 +67,7 @@ public class ProductsController : ControllerBase
                 product.PromotionProducts.Any(pp =>
                     pp.Promotion != null
                     && pp.Promotion.Active
-                    && pp.Promotion.CreatedAt <= now
+                    && pp.Promotion.StartsAt <= now
                     && pp.Promotion.EndsAt >= now));
         }
 
@@ -83,7 +83,7 @@ public class ProductsController : ControllerBase
                 product.PromotionProducts.Any(pp =>
                     pp.Promotion != null
                     && pp.Promotion.Active
-                    && pp.Promotion.CreatedAt <= now
+                    && pp.Promotion.StartsAt <= now
                     && pp.Promotion.EndsAt >= now)))
             .ToListAsync(cancellationToken);
 

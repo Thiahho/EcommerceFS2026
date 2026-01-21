@@ -22,7 +22,7 @@ public class PromotionsAdminController : ControllerBase
     {
         var promotions = await _dbContext.Promotions
             .AsNoTracking()
-            .OrderByDescending(promotion => promotion.CreatedAt)
+            .OrderByDescending(promotion => promotion.StartsAt)
             .ToListAsync(cancellationToken);
 
         return Ok(promotions);
@@ -38,7 +38,7 @@ public class PromotionsAdminController : ControllerBase
             Type = request.Type,
             Value = request.Value,
             Code = request.Code,
-            CreatedAt = request.CreatedAt,
+            StartsAt = request.StartsAt,
             EndsAt = request.EndsAt,
             Active = request.Active,
             Combinable = request.Combinable
@@ -66,7 +66,7 @@ public class PromotionsAdminController : ControllerBase
         promotion.Type = request.Type;
         promotion.Value = request.Value;
         promotion.Code = request.Code;
-        promotion.CreatedAt = request.CreatedAt;
+        promotion.StartsAt = request.StartsAt;
         promotion.EndsAt = request.EndsAt;
         promotion.Active = request.Active;
         promotion.Combinable = request.Combinable;

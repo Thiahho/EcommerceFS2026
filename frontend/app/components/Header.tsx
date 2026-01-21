@@ -10,6 +10,7 @@ export default function Header() {
         <nav className="flex items-center gap-6 text-sm font-medium text-ink">
           <Link href="/catalogo">Catálogo</Link>
           <Link href="/carrito">Carrito</Link>
+          <Link href="/checkout">Checkout</Link>
         </nav>
       </div>
     </header>
