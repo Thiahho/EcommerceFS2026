@@ -84,7 +84,11 @@ public class ProductsController : ControllerBase
                     pp.Promotion != null
                     && pp.Promotion.Active
                     && pp.Promotion.StartsAt <= now
-                    && pp.Promotion.EndsAt >= now)))
+                    && pp.Promotion.EndsAt >= now),
+                product.Variants
+                    .Where(v => v.Active && v.ImagePublicId != null)
+                    .Select(v => v.ImagePublicId)
+                    .FirstOrDefault()))
             .ToListAsync(cancellationToken);
 
         return Ok(products);
@@ -96,7 +100,6 @@ public class ProductsController : ControllerBase
         var product = await _dbContext.Products
             .AsNoTracking()
             .Include(item => item.Category)
-            .Include(item => item.Images)
             .Include(item => item.Variants)
             .FirstOrDefaultAsync(item => item.Slug == slug && item.Active, cancellationToken);
 
@@ -113,14 +116,6 @@ public class ProductsController : ControllerBase
             product.Slug,
             product.Category?.Name ?? string.Empty,
             product.Active,
-            product.Images
-                .OrderBy(image => image.Order)
-                .Select(image => new ProductImageDto(
-                    image.Id,
-                    image.Url,
-                    image.Order,
-                    image.AltText))
-                .ToList(),
             product.Variants
                 .Where(variant => variant.Active)
                 .Select(variant => new ProductVariantDto(
@@ -131,14 +126,16 @@ public class ProductsController : ControllerBase
                     variant.Sku,
                     variant.Price,
                     variant.StockActual,
-                    variant.StockReserved))
+                    variant.StockReserved,
+                    variant.Active,
+                    variant.ImagePublicId))
                 .ToList());
 
         return Ok(detail);
     }
 
-    [HttpGet("{id:guid}/variants")]
-    public async Task<IActionResult> GetVariants(Guid id, CancellationToken cancellationToken)
+    [HttpGet("{id:int}/variants")]
+    public async Task<IActionResult> GetVariants(int id, CancellationToken cancellationToken)
     {
         var variants = await _dbContext.ProductVariants
             .AsNoTracking()
@@ -151,7 +148,9 @@ public class ProductsController : ControllerBase
                 variant.Sku,
                 variant.Price,
                 variant.StockActual,
-                variant.StockReserved))
+                variant.StockReserved,
+                variant.Active,
+                variant.ImagePublicId))
             .ToListAsync(cancellationToken);
 
         return Ok(variants);

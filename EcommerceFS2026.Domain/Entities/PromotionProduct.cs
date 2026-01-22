@@ -6,9 +6,9 @@ namespace EcommerceFS2026.Domain.Entities;
 public class PromotionProduct
 {
     [Column("promotion_id")]
-    public Guid PromotionId { get; set; }
+    public int PromotionId { get; set; }
     [Column("product_id")]
-    public Guid ProductId { get; set; }
+    public int ProductId { get; set; }
 
     public Promotion? Promotion { get; set; }
     public Product? Product { get; set; }

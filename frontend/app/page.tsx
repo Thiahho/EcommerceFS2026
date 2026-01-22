@@ -5,7 +5,7 @@ import ProductCard from './components/ProductCard';
 export default async function HomePage() {
   const products = await fetchCatalog();
   const promos = products.filter((product) => product.hasActivePromotion).slice(0, 3);
-  const categories = Array.from(new Set(products.map((product) => product.categoryName))).slice(0, 4);
+  const categories = Array.from(new Set(products.map((product) => product.category))).slice(0, 4);
 
   return (
     <div className="space-y-16">

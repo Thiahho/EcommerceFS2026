@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("users")]
-public class User : Entity
+public class User 
 {
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     [Column("email")]
     public string Email { get; set; } = string.Empty;
     [Column("password_hash")]

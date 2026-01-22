@@ -1,7 +1,7 @@
 namespace EcommerceFS2026.Api.Models.Payments;
 
 public record ProcessPaymentRequest(
-    Guid OrderId,
+    int OrderId,
     string Token,
     string PaymentMethodId,
     int Installments,

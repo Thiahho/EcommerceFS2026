@@ -3,16 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("products")]
-public class Product : Entity
+public class Product 
 {
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("description")]
     public string Description { get; set; } = string.Empty;
     [Column("category_id")]
-    public Guid CategoryId { get; set; }
+    public int CategoryId { get; set; }
     [Column("brand")]
     public string Brand { get; set; } = string.Empty;
     [Column("slug")]
@@ -25,6 +25,5 @@ public class Product : Entity
     public DateTimeOffset UpdatedAt { get; set; }
     public Category? Category { get; set; }
     public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
-    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<PromotionProduct> PromotionProducts { get; set; } = new List<PromotionProduct>();
 }

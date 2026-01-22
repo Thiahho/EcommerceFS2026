@@ -26,13 +26,5 @@ export type AdminProductVariant = {
   stockActual: number;
   stockReserved: number;
   active: boolean;
-};
-
-export type AdminProductImage = {
-  id: string;
-  productId: string;
-  url: string;
-  order: number;
-  altText: string | null;
-  publicId: string | null;
+  imagePublicId: string | null;
 };

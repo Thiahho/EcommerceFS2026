@@ -4,10 +4,10 @@ using EcommerceFS2026.Domain.Enums;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("promotions")]
-public class Promotion : Entity
+public class Promotion 
 {
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("description")]

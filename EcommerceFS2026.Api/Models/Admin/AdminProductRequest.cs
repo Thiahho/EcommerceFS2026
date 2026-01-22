@@ -4,6 +4,6 @@ public record AdminProductRequest(
     string Name,
     string Description,
     string Brand,
-    Guid CategoryId,
+    int CategoryId,
     string Slug,
     bool Active);

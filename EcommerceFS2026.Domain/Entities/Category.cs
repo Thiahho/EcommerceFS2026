@@ -4,11 +4,11 @@ using System.Xml;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("categories")]
-public class Category : Entity
+public class Category
 {
 
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     [Column("name")]
     public string Name { get; set; } = string.Empty;
     [Column("slug")]

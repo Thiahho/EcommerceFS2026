@@ -3,13 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("order_items")]
-public class OrderItem : Entity
+public class OrderItem 
 {
     [Column("id")]
-    public Guid OrderId { get; set; }
+    public int Id { get; set; }
+
+    [Column("order_id")]
+    public int OrderId { get; set; }
 
     [Column("product_variant_id")]
-    public Guid ProductVariantId { get; set; }
+    public int ProductVariantId { get; set; }
 
     [Column("product_name")]
     public string ProductName { get; set; } = string.Empty;

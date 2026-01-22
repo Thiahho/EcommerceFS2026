@@ -8,4 +8,5 @@ public record AdminProductVariantRequest(
     decimal Price,
     int StockActual,
     int StockReserved,
-    bool Active);
+    bool Active,
+    string? ImagePublicId);

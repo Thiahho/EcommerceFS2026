@@ -26,7 +26,6 @@ public class CatalogAdminController : ControllerBase
             .AsNoTracking()
             .Include(product => product.Category)
             .Include(product => product.Variants)
-            .Include(product => product.Images)
             .OrderBy(product => product.Name)
             .Select(product => new AdminCatalogProductDto(
                 product.Id,
@@ -54,16 +53,8 @@ public class CatalogAdminController : ControllerBase
                         variant.Price,
                         variant.StockActual,
                         variant.StockReserved,
+                        variant.ImagePublicId,
                         variant.Active))
-                    .ToList(),
-                product.Images
-                    .OrderBy(image => image.Order)
-                    .Select(image => new AdminCatalogImageDto(
-                        image.Id,
-                        image.Url,
-                        image.Order,
-                        image.AltText,
-                        image.PublicId))
                     .ToList()))
             .ToListAsync(cancellationToken);
 

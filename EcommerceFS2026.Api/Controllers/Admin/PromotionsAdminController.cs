@@ -54,9 +54,9 @@ public class PromotionsAdminController : ControllerBase
         return CreatedAtAction(nameof(GetAll), new { id = promotion.Id }, promotion);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> Update(Guid id, AdminPromotionRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(int id, AdminPromotionRequest request, CancellationToken cancellationToken)
     {
         var promotion = await _dbContext.Promotions
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -82,9 +82,9 @@ public class PromotionsAdminController : ControllerBase
         return Ok(promotion);
     }
 
-    [HttpPost("{id:guid}/products")]
+    [HttpPost("{id:int}/products")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> AssignProduct(Guid id, AdminAssignPromotionProductRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AssignProduct(int id, AdminAssignPromotionProductRequest request, CancellationToken cancellationToken)
     {
         var promotionExists = await _dbContext.Promotions
             .AnyAsync(promotion => promotion.Id == id, cancellationToken);
@@ -115,9 +115,9 @@ public class PromotionsAdminController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{id:guid}/products/{productId:guid}")]
+    [HttpDelete("{id:int}/products/{productId:int}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> RemoveProduct(Guid id, Guid productId, CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveProduct(int id, int productId, CancellationToken cancellationToken)
     {
         var relation = await _dbContext.PromotionProducts
             .FirstOrDefaultAsync(pp => pp.PromotionId == id && pp.ProductId == productId, cancellationToken);

@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { adminFetch } from '../../lib/adminApi';
-import { AdminCategory, AdminProduct } from '../../lib/adminTypes';
-import { useAdminSession } from '../../hooks/useAdminSession';
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { adminFetch } from "../../lib/adminApi";
+import { AdminCategory, AdminProduct } from "../../lib/adminTypes";
+import { useAdminSession } from "../../hooks/useAdminSession";
 
 const emptyProductForm = {
-  name: '',
-  description: '',
-  brand: '',
-  slug: '',
-  categoryId: '',
+  name: "",
+  description: "",
+  brand: "",
+  slug: "",
+  categoryId: "",
   active: true,
 };
 
@@ -36,13 +36,17 @@ export default function AdminProductsPage() {
     const loadData = async () => {
       try {
         const [productsResponse, categoriesResponse] = await Promise.all([
-          adminFetch<AdminProduct[]>('/api/admin/products', token),
-          adminFetch<AdminCategory[]>('/api/admin/categories', token),
+          adminFetch<AdminProduct[]>("/api/admin/products", token),
+          adminFetch<AdminCategory[]>("/api/admin/categories", token),
         ]);
         setProducts(productsResponse);
         setCategories(categoriesResponse);
       } catch (error) {
-        setStatus(error instanceof Error ? error.message : 'No se pudo cargar la información.');
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : "No se pudo cargar la información.",
+        );
       }
     };
 
@@ -60,7 +64,7 @@ export default function AdminProductsPage() {
     }
 
     if (!form.categoryId) {
-      setStatus('Seleccioná una categoría para el producto.');
+      setStatus("Seleccioná una categoría para el producto.");
       return;
     }
 
@@ -69,23 +73,37 @@ export default function AdminProductsPage() {
 
     try {
       if (editingId) {
-        const updated = await adminFetch<AdminProduct>(`/api/admin/products/${editingId}`, token, {
-          method: 'PUT',
-          body: JSON.stringify(form),
-        });
-        setProducts((prev) => prev.map((item) => (item.id === editingId ? updated : item)));
-        setStatus('Producto actualizado.');
+        const updated = await adminFetch<AdminProduct>(
+          `/api/admin/products/${editingId}`,
+          token,
+          {
+            method: "PUT",
+            body: JSON.stringify(form),
+          },
+        );
+        setProducts((prev) =>
+          prev.map((item) => (item.id === editingId ? updated : item)),
+        );
+        setStatus("Producto actualizado.");
       } else {
-        const created = await adminFetch<AdminProduct>('/api/admin/products', token, {
-          method: 'POST',
-          body: JSON.stringify(form),
-        });
+        const created = await adminFetch<AdminProduct>(
+          "/api/admin/products",
+          token,
+          {
+            method: "POST",
+            body: JSON.stringify(form),
+          },
+        );
         setProducts((prev) => [created, ...prev]);
-        setStatus('Producto creado.');
+        setStatus("Producto creado.");
       }
       resetForm();
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'No se pudo guardar el producto.');
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar el producto.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -108,17 +126,50 @@ export default function AdminProductsPage() {
       return;
     }
 
-    const confirmed = window.confirm('¿Querés desactivar este producto?');
+    const confirmed = window.confirm("¿Querés desactivar este producto?");
     if (!confirmed) {
       return;
     }
 
     try {
-      await adminFetch(`/api/admin/products/${productId}`, token, { method: 'DELETE' });
-      setProducts((prev) => prev.map((item) => (item.id === productId ? { ...item, active: false } : item)));
-      setStatus('Producto desactivado.');
+      await adminFetch(`/api/admin/products/${productId}`, token, {
+        method: "DELETE",
+      });
+      setProducts((prev) =>
+        prev.map((item) =>
+          item.id === productId ? { ...item, active: false } : item,
+        ),
+      );
+      setStatus("Producto desactivado.");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'No se pudo desactivar el producto.');
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "No se pudo desactivar el producto.",
+      );
+    }
+  };
+
+  const handleActivate = async (productId: string) => {
+    if (!token) {
+      return;
+    }
+    try {
+      const updated = await adminFetch<AdminProduct>(
+        `/api/admin/products/${productId}/activate`,
+        token,
+        { method: "PATCH" },
+      );
+      setProducts((prev) =>
+        prev.map((item) => (item.id === productId ? updated : item)),
+      );
+      setStatus("Producto activado.");
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "No se pudo activar el producto.",
+      );
     }
   };
 
@@ -137,10 +188,14 @@ export default function AdminProductsPage() {
           <span className="badge bg-ink/10 text-ink">ABMS</span>
           <h1 className="text-2xl font-semibold text-ink">Productos</h1>
           <p className="text-sm text-slate-500">
-            Creá, editá y desactivá productos del catálogo con control de categoría.
+            Creá, editá y desactivá productos del catálogo con control de
+            categoría.
           </p>
         </div>
-        <Link href="/admin/dashboard" className="text-sm font-semibold text-ink hover:underline">
+        <Link
+          href="/admin/dashboard"
+          className="text-sm font-semibold text-ink hover:underline"
+        >
           Volver al dashboard
         </Link>
       </header>
@@ -149,7 +204,9 @@ export default function AdminProductsPage() {
         <div className="card space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-ink">Listado</h2>
-            <p className="text-xs text-slate-500">Se muestran productos activos e inactivos.</p>
+            <p className="text-xs text-slate-500">
+              Se muestran productos activos e inactivos.
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -165,12 +222,21 @@ export default function AdminProductsPage() {
               <tbody className="divide-y divide-slate-100">
                 {products.map((product) => (
                   <tr key={product.id} className="text-slate-600">
-                    <td className="py-3 font-semibold text-ink">{product.name}</td>
-                    <td className="py-3">{product.brand}</td>
-                    <td className="py-3">{categoryLookup.get(product.categoryId) ?? 'Sin categoría'}</td>
+                    <td className="py-3 font-semibold text-ink">
+                      {product.name}
+                    </td>
+                    <td className="py-3">{product.slug}</td>
                     <td className="py-3">
-                      <span className={product.active ? 'text-moss' : 'text-slate-400'}>
-                        {product.active ? 'Activo' : 'Inactivo'}
+                      {categoryLookup.get(product.categoryId) ??
+                        "Sin categoría"}
+                    </td>
+                    <td className="py-3">
+                      <span
+                        className={
+                          product.active ? "text-moss" : "text-slate-400"
+                        }
+                      >
+                        {product.active ? "Activo" : "Inactivo"}
                       </span>
                     </td>
                     <td className="py-3">
@@ -182,13 +248,23 @@ export default function AdminProductsPage() {
                         >
                           Editar
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeactivate(product.id)}
-                          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-red-500"
-                        >
-                          Desactivar
-                        </button>
+                        {product.active ? (
+                          <button
+                            type="button"
+                            onClick={() => handleDeactivate(product.id)}
+                            className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-red-500"
+                          >
+                            Desactivar
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleActivate(product.id)}
+                            className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-moss"
+                          >
+                            Activar
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -208,7 +284,7 @@ export default function AdminProductsPage() {
         <div className="card space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-ink">
-              {editingId ? 'Editar producto' : 'Crear producto'}
+              {editingId ? "Editar producto" : "Crear producto"}
             </h2>
             <p className="text-xs text-slate-500">
               Campos obligatorios: nombre, marca, slug y categoría.
@@ -219,32 +295,45 @@ export default function AdminProductsPage() {
               type="text"
               placeholder="Nombre del producto"
               value={form.name}
-              onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, name: event.target.value }))
+              }
               className="rounded-2xl border border-slate-200 px-4 py-3"
             />
             <input
               type="text"
               placeholder="Marca"
               value={form.brand}
-              onChange={(event) => setForm((prev) => ({ ...prev, brand: event.target.value }))}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, brand: event.target.value }))
+              }
               className="rounded-2xl border border-slate-200 px-4 py-3"
             />
             <input
               type="text"
               placeholder="Slug"
               value={form.slug}
-              onChange={(event) => setForm((prev) => ({ ...prev, slug: event.target.value }))}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, slug: event.target.value }))
+              }
               className="rounded-2xl border border-slate-200 px-4 py-3"
             />
             <textarea
               placeholder="Descripción"
               value={form.description}
-              onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
+              onChange={(event) =>
+                setForm((prev) => ({
+                  ...prev,
+                  description: event.target.value,
+                }))
+              }
               className="min-h-[120px] rounded-2xl border border-slate-200 px-4 py-3"
             />
             <select
               value={form.categoryId}
-              onChange={(event) => setForm((prev) => ({ ...prev, categoryId: event.target.value }))}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, categoryId: event.target.value }))
+              }
               className="rounded-2xl border border-slate-200 px-4 py-3"
             >
               <option value="">Seleccioná una categoría</option>
@@ -258,7 +347,9 @@ export default function AdminProductsPage() {
               <input
                 type="checkbox"
                 checked={form.active}
-                onChange={(event) => setForm((prev) => ({ ...prev, active: event.target.checked }))}
+                onChange={(event) =>
+                  setForm((prev) => ({ ...prev, active: event.target.checked }))
+                }
               />
               Producto activo
             </label>
@@ -271,7 +362,7 @@ export default function AdminProductsPage() {
               disabled={isSaving}
               className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isSaving ? 'Guardando...' : editingId ? 'Actualizar' : 'Crear'}
+              {isSaving ? "Guardando..." : editingId ? "Actualizar" : "Crear"}
             </button>
             {editingId ? (
               <button

@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("orders")]
-public class Order : Entity
+public class Order 
 {
     [Column("id")]
-    public Guid Id{get;set;}
+    public int Id{get;set;}
     
     [Column("customer_name")]
     public string CustomerName { get; set; } = string.Empty;
@@ -44,6 +44,12 @@ public class Order : Entity
 
     [Column("payment_status")]
     public string? PaymentStatus { get; set; }
+
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [Column("updated_at")]
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
     public ICollection<StockReservation> StockReservations { get; set; } = new List<StockReservation>();

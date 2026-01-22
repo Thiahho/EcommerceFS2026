@@ -4,14 +4,14 @@ using EcommerceFS2026.Domain.Enums;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("stock_reservations")]
-public class StockReservation : Entity
+public class StockReservation 
 {
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     [Column("product_variant_id")]
-    public Guid ProductVariantId { get; set; }
+    public int ProductVariantId { get; set; }
     [Column("order_id")]
-    public Guid? OrderId { get; set; }
+    public int? OrderId { get; set; }
     [Column("quantity")]
     public int Quantity { get; set; }
     [Column("created_at")]

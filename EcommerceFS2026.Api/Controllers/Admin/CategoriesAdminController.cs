@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using EcommerceFS2026.Api.Models.Admin;
 using EcommerceFS2026.Domain.Entities;
 using EcommerceFS2026.Infrastructure.Data;
@@ -26,6 +27,13 @@ public class CategoriesAdminController : ControllerBase
         var categories = await _dbContext.Categories
             .AsNoTracking()
             .OrderBy(category => category.Name)
+            .Select(CategoryAttribute => new AdminCategoryDto
+            {
+                Id = CategoryAttribute.Id,
+                Name = CategoryAttribute.Name,
+                Slug = CategoryAttribute.Slug,
+                Active = CategoryAttribute.Active,
+            })
             .ToListAsync(cancellationToken);
 
         return Ok(categories);
@@ -45,12 +53,18 @@ public class CategoriesAdminController : ControllerBase
         _dbContext.Categories.Add(category);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return CreatedAtAction(nameof(GetAll), new { id = category.Id }, category);
+        return CreatedAtAction(nameof(GetAll), new { id = category.Id }, new AdminCategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Slug = category.Slug,
+            Active = category.Active
+        });
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> Update(Guid id, AdminCategoryRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(int id, AdminCategoryRequest request, CancellationToken cancellationToken)
     {
         var category = await _dbContext.Categories
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -67,12 +81,18 @@ public class CategoriesAdminController : ControllerBase
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Ok(category);
+        return Ok(new AdminCategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Slug = category.Slug,
+            Active = category.Active
+        });
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
         var category = await _dbContext.Categories
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -88,5 +108,25 @@ public class CategoriesAdminController : ControllerBase
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpPatch("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Activate(int id, CancellationToken cancellationToken)
+    {
+        var category = await _dbContext.Categories
+            .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+
+        if (category is null)
+        {
+            return NotFound();
+        }
+
+        category.Active = true;
+        category.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok(category);
     }
 }

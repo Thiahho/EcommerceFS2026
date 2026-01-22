@@ -1,19 +1,13 @@
 export type ProductCatalogItem = {
-  id: string;
+  id: number;
   name: string;
   brand: string;
   slug: string;
-  categoryName: string;
+  category: string;
   minPrice: number;
-  inStock: boolean;
+  hasStock: boolean;
   hasActivePromotion: boolean;
-};
-
-export type ProductImage = {
-  id: string;
-  url: string;
-  order: number;
-  altText: string | null;
+  imagePublicId: string | null;
 };
 
 export type ProductVariant = {
@@ -25,25 +19,26 @@ export type ProductVariant = {
   price: number;
   stockActual: number;
   stockReserved: number;
+  active: boolean;
+  imagePublicId: string | null;
 };
 
 export type ProductDetail = {
-  id: string;
+  id: number;
   name: string;
   description: string;
   brand: string;
   slug: string;
-  categoryName: string;
+  category: string;
   active: boolean;
-  images: ProductImage[];
   variants: ProductVariant[];
 };
 
 export type CartItem = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  variantId: string;
+  variantId: number;
   variantLabel: string;
   price: number;
   quantity: number;

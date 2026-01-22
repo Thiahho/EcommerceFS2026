@@ -3,10 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EcommerceFS2026.Domain.Entities;
 
 [Table("product_variants")]
-public class ProductVariant : Entity
-{
+public class ProductVariant
+{   
     [Column("id")]
-    public Guid ProductId { get; set; }
+    public int Id { get; set; }
+    [Column("product_id")]
+    public int ProductId { get; set; }
     [Column("color")]
     public string Color { get; set; } = string.Empty;
     [Column("ram")]
@@ -23,6 +25,8 @@ public class ProductVariant : Entity
     public int StockReserved { get; set; }
     [Column("active")]
     public bool Active { get; set; } = true;
+    [Column("image_public_id")]
+    public string? ImagePublicId { get; set; }
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
 

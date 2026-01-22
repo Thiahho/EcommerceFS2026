@@ -5,6 +5,8 @@ import ProductCard from "../components/ProductCard";
 import { fetchCatalog } from "../lib/api";
 import { ProductCatalogItem } from "../lib/types";
 
+const INITIAL_PER_CATEGORY = 3;
+
 export default function CatalogPage() {
   const [products, setProducts] = useState<ProductCatalogItem[]>([]);
   const [brand, setBrand] = useState("");
@@ -15,6 +17,9 @@ export default function CatalogPage() {
   const [stock, setStock] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // { "Smartphones": true/false }
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function load() {
@@ -38,18 +43,42 @@ export default function CatalogPage() {
       }
       setLoading(false);
     }
-
     load();
   }, [brand, category, minPrice, maxPrice, promo, stock]);
 
   const brands = useMemo(
-    () => Array.from(new Set(products.map((product) => product.brand))),
+    () => Array.from(new Set(products.map((p) => p.brand))).sort(),
     [products],
   );
+
   const categories = useMemo(
-    () => Array.from(new Set(products.map((product) => product.categoryName))),
+    () => Array.from(new Set(products.map((p) => p.category))).sort(),
     [products],
   );
+
+  // Agrupar productos por categoría (ordenado)
+  const groupedByCategory = useMemo(() => {
+    const map = new Map<string, ProductCatalogItem[]>();
+
+    for (const p of products) {
+      const key = p.category || "Sin categoría";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(p);
+    }
+
+    // opcional: ordenar productos dentro de cada categoría
+    for (const [key, list] of map.entries()) {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+      map.set(key, list);
+    }
+
+    // orden de categorías
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [products]);
+
+  const toggleCategory = (cat: string) => {
+    setExpanded((prev) => ({ ...prev, [cat]: !prev[cat] }));
+  };
 
   return (
     <div className="space-y-10">
@@ -135,17 +164,52 @@ export default function CatalogPage() {
           </label>
         </aside>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {loading ? (
             <div className="card">Cargando catálogo...</div>
           ) : error ? (
             <div className="card text-sm text-rose-600">{error}</div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+          ) : groupedByCategory.length === 0 ? (
+            <div className="card text-sm text-slate-600">
+              No hay productos con los filtros seleccionados.
             </div>
+          ) : (
+            groupedByCategory.map(([cat, items]) => {
+              const isExpanded = !!expanded[cat];
+              const visible = isExpanded
+                ? items
+                : items.slice(0, INITIAL_PER_CATEGORY);
+              const hasMore = items.length > INITIAL_PER_CATEGORY;
+
+              return (
+                <section key={cat} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <h2 className="text-lg font-semibold text-ink">{cat}</h2>
+                      <p className="text-xs text-slate-500">
+                        {items.length} producto{items.length === 1 ? "" : "s"}
+                      </p>
+                    </div>
+
+                    {hasMore && (
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(cat)}
+                        className="rounded-full border border-ink px-4 py-2 text-xs font-semibold text-ink transition hover:bg-ink hover:text-white"
+                      >
+                        {isExpanded ? "Ver menos" : "Ver más"}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid gap-6 md:grid-cols-3">
+                    {visible.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </section>
+              );
+            })
           )}
         </div>
       </section>

@@ -19,9 +19,9 @@ public class ProductVariantsAdminController : ControllerBase
         _dbContext = dbContext;
     }
 
-    [HttpPost("product/{productId:guid}")]
+    [HttpPost("product/{productId:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> Create(Guid productId, AdminProductVariantRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(int productId, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var productExists = await _dbContext.Products
             .AnyAsync(product => product.Id == productId, cancellationToken);
@@ -41,7 +41,8 @@ public class ProductVariantsAdminController : ControllerBase
             Price = request.Price,
             StockActual = request.StockActual,
             StockReserved = request.StockReserved,
-            Active = request.Active
+            Active = request.Active,
+            ImagePublicId = request.ImagePublicId
         };
 
         _dbContext.ProductVariants.Add(variant);
@@ -50,9 +51,9 @@ public class ProductVariantsAdminController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = variant.Id }, variant);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
             .AsNoTracking()
@@ -66,9 +67,9 @@ public class ProductVariantsAdminController : ControllerBase
         return Ok(variant);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> Update(Guid id, AdminProductVariantRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(int id, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -86,6 +87,7 @@ public class ProductVariantsAdminController : ControllerBase
         variant.StockActual = request.StockActual;
         variant.StockReserved = request.StockReserved;
         variant.Active = request.Active;
+        variant.ImagePublicId = request.ImagePublicId;
         variant.UpdatedAt = DateTimeOffset.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -93,9 +95,9 @@ public class ProductVariantsAdminController : ControllerBase
         return Ok(variant);
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -113,9 +115,29 @@ public class ProductVariantsAdminController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("product/{productId:guid}")]
+    [HttpPatch("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Activate(int id, CancellationToken cancellationToken)
+    {
+        var variant = await _dbContext.ProductVariants
+            .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+
+        if (variant is null)
+        {
+            return NotFound();
+        }
+
+        variant.Active = true;
+        variant.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok(variant);
+    }
+
+    [HttpGet("product/{productId:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> GetByProduct(Guid productId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByProduct(int productId, CancellationToken cancellationToken)
     {
         var variants = await _dbContext.ProductVariants
             .AsNoTracking()

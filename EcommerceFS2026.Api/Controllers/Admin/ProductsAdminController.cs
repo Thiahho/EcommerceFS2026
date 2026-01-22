@@ -27,6 +27,16 @@ public class ProductsAdminController : ControllerBase
             .AsNoTracking()
             .Include(product => product.Category)
             .OrderBy(product => product.Name)
+            .Select(product => new AdminProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Brand = product.Brand,
+                Slug = product.Slug,
+                CategoryId = product.CategoryId,
+                Active = product.Active
+            })
             .ToListAsync(cancellationToken);
 
         return Ok(products);
@@ -57,12 +67,21 @@ public class ProductsAdminController : ControllerBase
         _dbContext.Products.Add(product);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return CreatedAtAction(nameof(GetAll), new { id = product.Id }, product);
+        return CreatedAtAction(nameof(GetAll), new { id = product.Id }, new AdminProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Brand = product.Brand,
+            Slug = product.Slug,
+            CategoryId = product.CategoryId,
+            Active = product.Active
+        });
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,Empleado")]
-    public async Task<IActionResult> Update(Guid id, AdminProductRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(int id, AdminProductRequest request, CancellationToken cancellationToken)
     {
         var product = await _dbContext.Products
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -82,12 +101,21 @@ public class ProductsAdminController : ControllerBase
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Ok(product);
+        return Ok(new AdminProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Brand = product.Brand,
+            Slug = product.Slug,
+            CategoryId = product.CategoryId,
+            Active = product.Active
+        });
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
         var product = await _dbContext.Products
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
@@ -104,4 +132,34 @@ public class ProductsAdminController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPatch("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Activate(int id, CancellationToken cancellationToken)
+    {
+        var product = await _dbContext.Products
+            .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+
+        if (product is null)
+        {
+            return NotFound();
+        }
+
+        product.Active = true;
+        product.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok(new AdminProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Brand = product.Brand,
+            Slug = product.Slug,
+            CategoryId = product.CategoryId,
+            Active = product.Active
+        });
+    }
+
 }

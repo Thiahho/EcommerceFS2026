@@ -11,7 +11,7 @@ public record CreateOrderRequest(
     List<CreateOrderItemRequest> Items);
 
 public record CreateOrderItemRequest(
-    Guid ProductVariantId,
+    int ProductVariantId,
     string ProductName,
     decimal UnitPrice,
     int Quantity);

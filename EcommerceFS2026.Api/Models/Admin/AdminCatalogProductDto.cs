@@ -1,24 +1,23 @@
 namespace EcommerceFS2026.Api.Models.Admin;
 
 public record AdminCatalogProductDto(
-    Guid Id,
+    int Id,
     string Name,
     string Description,
     string Brand,
     string Slug,
     bool Active,
     AdminCatalogCategoryDto? Category,
-    List<AdminCatalogVariantDto> Variants,
-    List<AdminCatalogImageDto> Images);
+    List<AdminCatalogVariantDto> Variants);
 
 public record AdminCatalogCategoryDto(
-    Guid Id,
+    int Id,
     string Name,
     string Slug,
     bool Active);
 
 public record AdminCatalogVariantDto(
-    Guid Id,
+    int Id,
     string Color,
     string Ram,
     string Storage,
@@ -26,11 +25,5 @@ public record AdminCatalogVariantDto(
     decimal Price,
     int StockActual,
     int StockReserved,
+    string? ImagePublicId,
     bool Active);
-
-public record AdminCatalogImageDto(
-    Guid Id,
-    string Url,
-    int Order,
-    string? AltText,
-    string? PublicId);

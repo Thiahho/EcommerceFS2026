@@ -1,7 +1,7 @@
 namespace EcommerceFS2026.Api.Models;
 
 public record PromotionDto(
-    Guid Id,
+    int Id,
     string Name,
     string Description,
     decimal Value,
