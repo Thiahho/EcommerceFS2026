@@ -23,6 +23,11 @@ public class OrderItem
     [Column("quantity")]
     public int Quantity { get; set; }
 
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
+
     public Order? Order { get; set; }
     public ProductVariant? ProductVariant { get; set; }
 }

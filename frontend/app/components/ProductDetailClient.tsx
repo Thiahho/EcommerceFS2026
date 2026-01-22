@@ -132,6 +132,7 @@ export default function ProductDetailClient({
                 variantLabel: `${selectedVariant.color} / ${selectedVariant.ram} / ${selectedVariant.storage}`,
                 price: selectedVariant.price,
                 quantity,
+                imagePublicId: selectedVariant.imagePublicId ?? null,
               });
               setAdded(true);
             }}

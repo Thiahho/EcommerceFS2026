@@ -79,7 +79,8 @@ public async Task<IActionResult> GetPaymentMethods(CancellationToken cancellatio
                 Title = item.Title,
                 Quantity = item.Quantity,
                 CurrencyId = item.CurrencyId,
-                UnitPrice = item.UnitPrice
+                UnitPrice = item.UnitPrice,
+                PictureUrl = string.IsNullOrWhiteSpace(item.PictureUrl) ? null : item.PictureUrl,
             }).ToList(),
             AutoReturn = "approved",
             BackUrls = new PreferenceBackUrlsRequest
@@ -90,13 +91,20 @@ public async Task<IActionResult> GetPaymentMethods(CancellationToken cancellatio
             }
         };
 
-       var requestOptions = new RequestOptions { AccessToken = accessToken };
+        var requestOptions = new RequestOptions { AccessToken = accessToken };
 
-        var client = new PreferenceClient();
-        Preference preference = await client.CreateAsync(preferenceRequest, requestOptions);
-
-
-        return Ok(new { preference.Id });
+        try
+        {
+            var client = new PreferenceClient();
+            Preference preference = await client.CreateAsync(preferenceRequest, requestOptions);
+            return Ok(new { preference.Id });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error MercadoPago: {ex.Message}");
+            Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
     }
 
     [HttpPost("process")]

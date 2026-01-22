@@ -20,7 +20,7 @@ public class StockReservation
     public DateTimeOffset UpdatedAt { get; set; }
     [Column("expires_at")]
     public DateTimeOffset ExpiresAt { get; set; }
-
+    [Column("status")]
     public StockReservationStatus Status { get; set; } = StockReservationStatus.Active;
 
     public Order? Order { get; set; }
