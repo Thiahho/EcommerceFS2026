@@ -11,6 +11,7 @@ namespace EcommerceFS2026.Api.Controllers.Admin;
 [ApiController]
 [Authorize]
 [Route("api/admin/categories")]
+
 public class CategoriesAdminController : ControllerBase
 {
     private readonly AppDbContext _dbContext;
