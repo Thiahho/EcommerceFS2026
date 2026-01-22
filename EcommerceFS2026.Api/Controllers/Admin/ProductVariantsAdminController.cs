@@ -20,7 +20,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpPost("product/{productId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Create(Guid productId, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var productExists = await _dbContext.Products
@@ -51,7 +51,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "Admin,Vendedor")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
@@ -67,7 +67,7 @@ public class ProductVariantsAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Update(Guid id, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
@@ -111,5 +111,19 @@ public class ProductVariantsAdminController : ControllerBase
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpGet("product/{productId:guid}")]
+    [Authorize(Roles = "Admin,Empleado")]
+    public async Task<IActionResult> GetByProduct(Guid productId, CancellationToken cancellationToken)
+    {
+        var variants = await _dbContext.ProductVariants
+            .AsNoTracking()
+            .Where(variant => variant.ProductId == productId)
+            .OrderByDescending(variant => variant.Active)
+            .ThenBy(variant => variant.Sku)
+            .ToListAsync(cancellationToken);
+
+        return Ok(variants);
     }
 }

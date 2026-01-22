@@ -8,18 +8,22 @@ const catalogItems = [
   {
     title: 'Productos',
     description: 'Crea, edita y desactiva productos del catálogo.',
+    href: '/admin/productos',
   },
   {
     title: 'Categorías',
     description: 'Organiza el catálogo por categoría y slug.',
+    href: '/admin/categorias',
   },
   {
     title: 'Variantes',
     description: 'Define stock, precio y SKU por variante.',
+    href: '/admin/variantes',
   },
   {
     title: 'Imágenes',
     description: 'Gestiona imágenes y orden de visualización.',
+    href: '/admin/imagenes',
   },
 ];
 
@@ -101,7 +105,7 @@ export default function AdminDashboardPage() {
           <div>
             <h2 className="text-xl font-semibold text-ink">Estado de la sesión</h2>
             <p className="text-sm text-slate-500">
-              Autenticación con JWT y roles para administradores y vendedores.
+              Autenticación con JWT y roles para administradores y empleados.
             </p>
           </div>
           <div className="rounded-2xl border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-700">
@@ -124,11 +128,11 @@ export default function AdminDashboardPage() {
 
       <section className="grid gap-6 md:grid-cols-2">
         {catalogItems.map((item) => (
-          <div key={item.title} className="card space-y-2">
+          <Link key={item.title} href={item.href} className="card space-y-2 transition hover:-translate-y-1 hover:shadow-md">
             <h3 className="text-lg font-semibold text-ink">{item.title}</h3>
             <p className="text-sm text-slate-500">{item.description}</p>
-            <span className="text-xs font-semibold text-moss">Disponible en API</span>
-          </div>
+            <span className="text-xs font-semibold text-moss">Gestionar módulo</span>
+          </Link>
         ))}
       </section>
     </div>
