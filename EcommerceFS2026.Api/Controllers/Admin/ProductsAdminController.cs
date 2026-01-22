@@ -20,7 +20,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Vendedor")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var products = await _dbContext.Products
@@ -33,7 +33,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Create(AdminProductRequest request, CancellationToken cancellationToken)
     {
         var categoryExists = await _dbContext.Categories
@@ -61,7 +61,7 @@ public class ProductsAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Update(Guid id, AdminProductRequest request, CancellationToken cancellationToken)
     {
         var product = await _dbContext.Products

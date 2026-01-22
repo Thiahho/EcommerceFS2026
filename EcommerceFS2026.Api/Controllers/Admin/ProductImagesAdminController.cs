@@ -20,7 +20,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpPost("product/{productId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Create(Guid productId, AdminProductImageRequest request, CancellationToken cancellationToken)
     {
         var productExists = await _dbContext.Products
@@ -47,7 +47,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "Admin,Vendedor")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var image = await _dbContext.ProductImages
@@ -63,7 +63,7 @@ public class ProductImagesAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Update(Guid id, AdminProductImageRequest request, CancellationToken cancellationToken)
     {
         var image = await _dbContext.ProductImages
@@ -101,5 +101,18 @@ public class ProductImagesAdminController : ControllerBase
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpGet("product/{productId:guid}")]
+    [Authorize(Roles = "Admin,Empleado")]
+    public async Task<IActionResult> GetByProduct(Guid productId, CancellationToken cancellationToken)
+    {
+        var images = await _dbContext.ProductImages
+            .AsNoTracking()
+            .Where(image => image.ProductId == productId)
+            .OrderBy(image => image.Order)
+            .ToListAsync(cancellationToken);
+
+        return Ok(images);
     }
 }

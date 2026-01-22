@@ -102,7 +102,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
           <p className="text-center text-xs text-slate-500">
-            Autenticación con JWT y roles para administradores y vendedores.
+            Autenticación con JWT y roles para administradores y empleados.
           </p>
         </div>
 

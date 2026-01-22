@@ -71,7 +71,7 @@ para el ecommerce de productos tecnológicos (teléfonos, notebooks, parlantes, 
 - `Id` (PK)
 - `Email`
 - `PasswordHash`
-- `Rol` (Admin | Vendedor | Cliente)
+- `Rol` (Admin | Empleado | Cliente)
 - `Nombre`, `Apellido`
 - `Activo`
 - `CreatedAt`, `UpdatedAt`
@@ -384,7 +384,7 @@ https://wa.me/54XXXXXXXXXX?text=Hola,%20quiero%20coordinar%20mi%20pedido%20#TRK-
 2. Implementar reservas de stock.
 3. Integrar Mercado Pago + webhook.
 4. Implementar generación de PDF.
-5. Panel admin/vendedor.
+5. Panel admin/empleado.
 6. Integración con HubSpot y GA4.
 
 ## 12) Stack frontend recomendado (profesional y actualizado)
@@ -490,7 +490,7 @@ src/hooks/ (hooks propios)
 5. **Pedidos**
    - estados + tracking
 6. **Usuarios y roles**
-   - admin / vendedor / cliente
+   - admin / empleado / cliente
 7. **Notificaciones**
    - email + WhatsApp
 8. **Admin**
@@ -501,7 +501,7 @@ src/hooks/ (hooks propios)
 ### 15.2 Permisos sugeridos
 
 - **Admin**: todo.
-- **Vendedor**: catálogo + stock + pedidos (sin costos/ganancias ni reportes de ventas).
+- **Empleado**: catálogo + stock + pedidos (sin costos/ganancias ni reportes de ventas).
 - **Cliente**: compras y tracking.
 
 ---

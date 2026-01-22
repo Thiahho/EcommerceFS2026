@@ -20,7 +20,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Vendedor")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var promotions = await _dbContext.Promotions
@@ -32,7 +32,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Create(AdminPromotionRequest request, CancellationToken cancellationToken)
     {
         var promotion = new Promotion
@@ -55,7 +55,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Update(Guid id, AdminPromotionRequest request, CancellationToken cancellationToken)
     {
         var promotion = await _dbContext.Promotions
@@ -83,7 +83,7 @@ public class PromotionsAdminController : ControllerBase
     }
 
     [HttpPost("{id:guid}/products")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> AssignProduct(Guid id, AdminAssignPromotionProductRequest request, CancellationToken cancellationToken)
     {
         var promotionExists = await _dbContext.Promotions

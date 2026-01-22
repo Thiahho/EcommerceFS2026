@@ -15,7 +15,7 @@ public class AuthController : ControllerBase
     private static readonly HashSet<string> AllowedRoles = new(StringComparer.OrdinalIgnoreCase)
     {
         "Admin",
-        "Vendedor",
+        "Empleado",
         "Cliente"
     };
 
@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
 
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         var role = hasUsers
-            ? (string.IsNullOrWhiteSpace(request.Role) ? "Vendedor" : request.Role.Trim())
+            ? (string.IsNullOrWhiteSpace(request.Role) ? "Empleado" : request.Role.Trim())
             : "Admin";
 
         if (!AllowedRoles.Contains(role))

@@ -20,7 +20,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Vendedor")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var categories = await _dbContext.Categories
@@ -32,7 +32,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Create(AdminCategoryRequest request, CancellationToken cancellationToken)
     {
         var category = new Category
@@ -49,7 +49,7 @@ public class CategoriesAdminController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Update(Guid id, AdminCategoryRequest request, CancellationToken cancellationToken)
     {
         var category = await _dbContext.Categories
