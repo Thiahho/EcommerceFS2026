@@ -18,7 +18,16 @@ export default function ProductDetailClient({
   const { addItem } = useCart();
 
   const variantsWithImage = product.variants.filter((v) => v.imagePublicId);
+  const formatVariantLabel = (
+      variant: ProductDetail["variants"][number],
+      separator = " · ",
+    ) => {
+    const parts = [variant.color, variant.ram, variant.storage]
+      .map((value) => value?.trim())
+      .filter(Boolean);
 
+    return parts.length ? parts.join(separator) : "Variante";
+  };
   return (
     <div className="grid gap-10 md:grid-cols-[1.1fr_1fr]">
       <div className="space-y-4">
@@ -58,6 +67,8 @@ export default function ProductDetailClient({
                     : "border-cloud"
                 }`}
               >
+                {[variant.color, variant.ram, variant.storage]
+                  .filter(val=> val && val.trim() !=="").join(" . ")}
                 <CldImage
                   src={variant.imagePublicId!}
                   alt={`${variant.color}`}
@@ -96,21 +107,24 @@ export default function ProductDetailClient({
                     : "border-cloud bg-white text-ink"
                 }`}
               >
-                {variant.color} · {variant.ram} · {variant.storage}
+                 {formatVariantLabel(variant)}
               </button>
             ))}
           </div>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-semibold text-ink">
-            ${selectedVariant.price.toLocaleString("es-AR")}
-          </span>
-          <span className="text-xs font-semibold text-slate-500">
-            Stock disponible:{" "}
-            {selectedVariant.stockActual - selectedVariant.stockReserved}
-          </span>
-        </div>
+        <span className="text-2xl font-semibold text-ink">
+          {/* Agregamos el signo "?" después de selectedVariant */}
+          ${selectedVariant?.price ? selectedVariant.price.toLocaleString("es-AR") : "---"}
+        </span>
+        <span className="text-xs font-semibold text-slate-500">
+          Stock disponible:{" "}
+          {selectedVariant 
+            ? (selectedVariant.stockActual - selectedVariant.stockReserved) 
+            : 0}
+        </span>
+      </div>
 
         <div className="flex items-center gap-4">
           <input
@@ -129,7 +143,7 @@ export default function ProductDetailClient({
                 name: product.name,
                 slug: product.slug,
                 variantId: selectedVariant.id,
-                variantLabel: `${selectedVariant.color} / ${selectedVariant.ram} / ${selectedVariant.storage}`,
+                variantLabel: formatVariantLabel(selectedVariant, " / "),
                 price: selectedVariant.price,
                 quantity,
                 imagePublicId: selectedVariant.imagePublicId ?? null,

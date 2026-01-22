@@ -90,79 +90,88 @@ export default function CatalogPage() {
       </header>
 
       <section className="grid gap-6 md:grid-cols-[260px_1fr]">
-        <aside className="card space-y-6">
-          <div>
-            <label className="text-xs font-semibold uppercase text-slate-500">
-              Marca
-            </label>
-            <select
-              className="mt-2 w-full rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
-              value={brand}
-              onChange={(event) => setBrand(event.target.value)}
-            >
-              <option value="">Todas</option>
-              {brands.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
+       {/* h-fit: hace que el fondo y el borde terminen donde termina el último input.
+  sticky top-10: (opcional) hace que el filtro se quede fijo al bajar scroll.
+*/}
+<aside className="card h-fit space-y-6 md:sticky md:top-10">
+  <div>
+    <label className="text-xs font-semibold uppercase text-slate-500">
+      Marca
+    </label>
+    <select
+      className="mt-2 w-full rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
+      value={brand}
+      onChange={(event) => setBrand(event.target.value)}
+    >
+      <option value="">Todas</option>
+      {brands.map((item) => (
+        <option key={item} value={item}>
+          {item}
+        </option>
+      ))}
+    </select>
+  </div>
 
-          <div>
-            <label className="text-xs font-semibold uppercase text-slate-500">
-              Categoría
-            </label>
-            <select
-              className="mt-2 w-full rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            >
-              <option value="">Todas</option>
-              {categories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
+  {/* ... resto de tus filtros (Categoría, Precio, Checkboxes) ... */}
+  
+  <div>
+    <label className="text-xs font-semibold uppercase text-slate-500">
+      Categoría
+    </label>
+    <select
+      className="mt-2 w-full rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
+      value={category}
+      onChange={(event) => setCategory(event.target.value)}
+    >
+      <option value="">Todas</option>
+      {categories.map((item) => (
+        <option key={item} value={item}>
+          {item}
+        </option>
+      ))}
+    </select>
+  </div>
 
-          <div className="grid gap-3">
-            <label className="text-xs font-semibold uppercase text-slate-500">
-              Precio
-            </label>
-            <input
-              className="rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
-              placeholder="Mínimo"
-              value={minPrice}
-              onChange={(event) => setMinPrice(event.target.value)}
-            />
-            <input
-              className="rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
-              placeholder="Máximo"
-              value={maxPrice}
-              onChange={(event) => setMaxPrice(event.target.value)}
-            />
-          </div>
+  <div className="grid gap-3">
+    <label className="text-xs font-semibold uppercase text-slate-500">
+      Precio
+    </label>
+    <input
+      className="rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
+      placeholder="Mínimo"
+      value={minPrice}
+      onChange={(event) => setMinPrice(event.target.value)}
+    />
+    <input
+      className="rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
+      placeholder="Máximo"
+      value={maxPrice}
+      onChange={(event) => setMaxPrice(event.target.value)}
+    />
+  </div>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={promo}
-              onChange={(event) => setPromo(event.target.checked)}
-            />
-            Solo promos activas
-          </label>
+  <div className="space-y-3">
+    <label className="flex items-center gap-2 text-sm cursor-pointer">
+      <input
+        type="checkbox"
+        className="rounded border-cloud text-ink focus:ring-ink"
+        checked={promo}
+        onChange={(event) => setPromo(event.target.checked)}
+      />
+      Solo promos activas
+    </label>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={stock}
-              onChange={(event) => setStock(event.target.checked)}
-            />
-            Solo con stock
-          </label>
-        </aside>
+    <label className="flex items-center gap-2 text-sm cursor-pointer">
+      <input
+        type="checkbox"
+        className="rounded border-cloud text-ink focus:ring-ink"
+        checked={stock}
+        onChange={(event) => setStock(event.target.checked)}
+      />
+      Solo con stock
+    </label>
+  </div>
+</aside>
 
         <div className="space-y-8">
           {loading ? (
