@@ -35,21 +35,18 @@ const catalogItems = [
     description: 'Consulta reservas, stock disponible y alertas por nivel.',
     href: '/admin/stock',
   },
-  {
-    title: 'Imágenes',
-    description: 'Gestiona imágenes y orden de visualización.',
-    href: '/admin/imagenes',
-  },
 ];
 
 const quickActions = [
   {
     label: 'Ver promociones',
     detail: 'Revisa descuentos activos.',
+    href: '/admin/promociones'
   },
   {
     label: 'Auditar stock',
     detail: 'Consulta reservas y stock disponible.',
+    href: '/admin/stock',
   },
 ];
 
@@ -128,10 +125,12 @@ export default function AdminDashboardPage() {
           <h3 className="text-lg font-semibold text-ink">Acciones rápidas</h3>
           <ul className="space-y-3 text-sm">
             {quickActions.map((action) => (
-              <li key={action.label} className="rounded-2xl border border-slate-100 p-4">
+              <Link key={action.label} href={action.href} className="rounded-2xl border border-slate-100 p-4">               
+                <li className='rounded-2x1 border border-slate-100 9-4'>
                 <p className="font-semibold text-ink">{action.label}</p>
                 <p className="text-xs text-slate-500">{action.detail}</p>
               </li>
+              </Link>
             ))}
           </ul>
         </div>
