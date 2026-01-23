@@ -11,14 +11,29 @@ const catalogItems = [
     href: '/admin/productos',
   },
   {
+    title: 'Órdenes',
+    description: 'Revisa pedidos, estados de pago y descarga comprobantes.',
+    href: '/admin/ordenes',
+  },
+  {
     title: 'Categorías',
     description: 'Organiza el catálogo por categoría y slug.',
     href: '/admin/categorias',
   },
   {
+    title: 'Promociones',
+    description: 'Configura descuentos, precios especiales y 2x1.',
+    href: '/admin/promociones',
+  },
+  {
     title: 'Variantes',
     description: 'Define stock, precio y SKU por variante.',
     href: '/admin/variantes',
+  },
+  {
+    title: 'Auditar stock',
+    description: 'Consulta reservas, stock disponible y alertas por nivel.',
+    href: '/admin/stock',
   },
   {
     title: 'Imágenes',
