@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { ProductDetail } from "../lib/types";
 import { useCart } from "../hooks/useCart";
@@ -14,10 +13,19 @@ export default function ProductDetailClient({
 }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
   const variantsWithImage = product.variants.filter((v) => v.imagePublicId);
+  const formatVariantLabel = (
+    variant: ProductDetail["variants"][number],
+    separator = " · ",
+  ) => {
+    const parts = [variant.color, variant.ram, variant.storage]
+      .map((value) => value?.trim())
+      .filter(Boolean);
+
+    return parts.length ? parts.join(separator) : "Variante";
+  };
 
   return (
     <div className="grid gap-10 md:grid-cols-[1.1fr_1fr]">
@@ -96,7 +104,7 @@ export default function ProductDetailClient({
                     : "border-cloud bg-white text-ink"
                 }`}
               >
-                {variant.color} · {variant.ram} · {variant.storage}
+                {formatVariantLabel(variant)}
               </button>
             ))}
           </div>
@@ -129,28 +137,19 @@ export default function ProductDetailClient({
                 name: product.name,
                 slug: product.slug,
                 variantId: selectedVariant.id,
-                variantLabel: `${selectedVariant.color} / ${selectedVariant.ram} / ${selectedVariant.storage}`,
+                variantLabel: formatVariantLabel(selectedVariant, " / "),
                 price: selectedVariant.price,
                 quantity,
                 imagePublicId: selectedVariant.imagePublicId ?? null,
               });
-              setAdded(true);
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new Event("cart:open"));
+              }
             }}
           >
             Agregar al carrito
           </button>
         </div>
-        {added && (
-          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
-            <span>Producto agregado al carrito.</span>
-            <Link href="/carrito" className="font-semibold text-moss">
-              Ir al carrito
-            </Link>
-            <Link href="/checkout" className="font-semibold text-ink">
-              Finalizar compra
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );

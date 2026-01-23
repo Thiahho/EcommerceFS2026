@@ -11,7 +11,7 @@ export type ProductCatalogItem = {
 };
 
 export type ProductVariant = {
-  id: string;
+  id: number;
   color: string;
   ram: string;
   storage: string;
