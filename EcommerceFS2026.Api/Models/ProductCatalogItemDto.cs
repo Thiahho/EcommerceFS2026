@@ -9,5 +9,7 @@ public record ProductCatalogItemDto(
     decimal MinPrice,
     bool HasStock,
     bool HasActivePromotion,
+    int? ActivePromotionType,
+    decimal? ActivePromotionValue,
     string? ImagePublicId
 );
