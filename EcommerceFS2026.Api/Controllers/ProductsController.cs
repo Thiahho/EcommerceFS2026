@@ -92,7 +92,7 @@ public class ProductsController : ControllerBase
                     minPrice,
                     product.Variants.Any(variant => variant.StockActual - variant.StockReserved > 0),
                     promotion != null,
-                    promotion?.Type,
+                    (int?)promotion?.Type,
                     promotion?.Value,
                     product.Variants
                         .Where(v => v.Active && v.ImagePublicId != null)
@@ -134,7 +134,7 @@ public class ProductsController : ControllerBase
             product.Category?.Name ?? string.Empty,
             product.Active,
             bestPromotion != null,
-            bestPromotion?.Type,
+            (int?)bestPromotion?.Type,
             bestPromotion?.Value,
             product.Variants
                 .Where(variant => variant.Active)
