@@ -71,7 +71,7 @@ export default function ProductCard({
   }, []);
 
   return (
-    <article className="group flex flex-col rounded-3xl bg-white p-5 shadow-soft transition hover:-translate-y-1">
+    <article className="group flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-soft transition hover:-translate-y-1">
       <div className="object-contain p-2">
         {mounted && product.imagePublicId ? (
           <CldImage
@@ -83,13 +83,13 @@ export default function ProductCard({
             className="object-contain"
           />
         ) : (
-          <div className="flex h-[220px] w-[220px] items-center justify-center bg-slate-100 rounded-xl">
+          <div className="flex h-[220px] w-[220px] items-center justify-center rounded-xl bg-slate-100">
             {!mounted ? (
               <span className="text-slate-400 text-sm">Cargando...</span>
             ) : (
               <Image
-                src={`https://placehold.co/400x400?text=${encodeURIComponent(product.name)}`}
-                alt={product.name}
+                src="/product-placeholder.svg"
+                alt={`Imagen genérica de ${product.name}`}
                 width={220}
                 height={220}
                 className="object-contain"

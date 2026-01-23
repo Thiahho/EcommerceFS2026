@@ -4,11 +4,11 @@
 
 :root {
   color-scheme: light;
-  --bg: #f8f5f2;
-  --text: #0f172a;
-  --accent: #2b7a78;
-  --accent-strong: #ff7a59;
-  --muted: #64748b;
+  --bg: #f3f4f6;
+  --text: #111827;
+  --accent: #111827;
+  --accent-strong: #4b5563;
+  --muted: #6b7280;
   --card: #ffffff;
 }
 
@@ -19,7 +19,7 @@ body {
 }
 
 .section-title {
-  @apply text-2xl font-semibold text-ink;
+  @apply text-2xl font-semibold uppercase tracking-tight text-ink;
 }
 
 .badge {
@@ -27,7 +27,7 @@ body {
 }
 
 .card {
-  @apply rounded-3xl bg-white p-6 shadow-soft;
+  @apply rounded-3xl bg-white p-6 shadow-soft border border-slate-200/70;
 }
 
 .container {
