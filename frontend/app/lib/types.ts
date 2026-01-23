@@ -42,5 +42,6 @@ export type CartItem = {
   variantLabel: string;
   price: number;
   quantity: number;
+  stockAvailable: number;
   imagePublicId: string | null;
 };

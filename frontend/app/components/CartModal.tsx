@@ -132,11 +132,15 @@ export default function CartModal() {
                             onClick={() =>
                               handleIncrease(item.variantId, item.quantity)
                             }
-                            className="h-7 w-7 rounded-full border border-cloud text-sm font-semibold text-ink"
+                            disabled={item.quantity >= item.stockAvailable}
+                            className="h-7 w-7 rounded-full border border-cloud text-sm font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             +
                           </button>
                         </div>
+                        <p className="mt-2 text-[11px] text-slate-400">
+                          Stock disponible: {item.stockAvailable}
+                        </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-ink">

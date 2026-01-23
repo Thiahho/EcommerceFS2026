@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { ProductDetail } from "../lib/types";
@@ -13,14 +13,22 @@ export default function ProductDetailClient({
 }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
-  const [mounted, setMounted] = useState(false);
   const { addItem } = useCart();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const variantsWithImage = product.variants.filter((v) => v.imagePublicId);
+  const availableStock = Math.max(
+    selectedVariant.stockActual - selectedVariant.stockReserved,
+    0,
+  );
+
+  useEffect(() => {
+    setQuantity((prev) => {
+      if (availableStock <= 0) {
+        return 0;
+      }
+      return Math.min(prev || 1, availableStock);
+    });
+  }, [availableStock]);
   const formatVariantLabel = (
     variant: ProductDetail["variants"][number],
     separator = " · ",
@@ -117,7 +125,7 @@ export default function ProductDetailClient({
 
         <div className="flex items-center justify-between">
           <span className="text-2xl font-semibold text-ink">
-            ${mounted ? selectedVariant.price.toLocaleString("es-AR") : selectedVariant.price}
+            ${selectedVariant.price.toLocaleString("es-AR")}
           </span>
           <span className="text-xs font-semibold text-slate-500">
             Stock disponible:{" "}
@@ -128,15 +136,27 @@ export default function ProductDetailClient({
         <div className="flex items-center gap-4">
           <input
             type="number"
-            min={1}
+            min={availableStock > 0 ? 1 : 0}
+            max={availableStock}
             value={quantity}
-            onChange={(event) => setQuantity(Number(event.target.value))}
+            onChange={(event) =>
+              setQuantity(
+                Math.max(
+                  availableStock > 0 ? 1 : 0,
+                  Math.min(availableStock, Number(event.target.value)),
+                ),
+              )
+            }
             className="w-20 rounded-2xl border border-cloud px-3 py-2 text-center"
           />
           <button
             type="button"
-            className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
+            disabled={availableStock <= 0 || quantity <= 0}
+            className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
             onClick={() => {
+              if (availableStock <= 0 || quantity <= 0) {
+                return;
+              }
               addItem({
                 id: product.id,
                 name: product.name,
@@ -144,7 +164,8 @@ export default function ProductDetailClient({
                 variantId: selectedVariant.id,
                 variantLabel: formatVariantLabel(selectedVariant, " / "),
                 price: selectedVariant.price,
-                quantity,
+                quantity: Math.min(quantity, availableStock),
+                stockAvailable: availableStock,
                 imagePublicId: selectedVariant.imagePublicId ?? null,
               });
               if (typeof window !== "undefined") {

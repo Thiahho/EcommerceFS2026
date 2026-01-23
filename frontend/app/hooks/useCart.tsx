@@ -18,7 +18,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [];
     }
     const stored = localStorage.getItem("cart");
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) {
+      return [];
+    }
+    const parsed = JSON.parse(stored) as CartItem[];
+    return parsed.map((item) => ({
+      ...item,
+      stockAvailable:
+        typeof item.stockAvailable === "number"
+          ? item.stockAvailable
+          : item.quantity,
+    }));
   });
 
   useEffect(() => {
@@ -29,13 +39,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((entry) => entry.variantId === item.variantId);
       if (existing) {
-        return prev.map((entry) =>
-          entry.variantId === item.variantId
-            ? { ...entry, quantity: entry.quantity + item.quantity }
-            : entry
-        );
+        return prev.map((entry) => {
+          if (entry.variantId !== item.variantId) {
+            return entry;
+          }
+          const maxStock =
+            typeof item.stockAvailable === "number"
+              ? item.stockAvailable
+              : entry.quantity;
+          const nextQuantity = Math.min(
+            entry.quantity + item.quantity,
+            maxStock,
+          );
+          return {
+            ...entry,
+            quantity: nextQuantity,
+            stockAvailable: maxStock,
+          };
+        });
       }
-      return [...prev, item];
+      return [
+        ...prev,
+        {
+          ...item,
+          quantity: Math.min(item.quantity, item.stockAvailable),
+        },
+      ];
     });
   };
 
@@ -45,12 +74,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateItemQuantity = (variantId: number, quantity: number) => {
     setItems((prev) => {
-      if (quantity <= 0) {
-        return prev.filter((item) => item.variantId !== variantId);
-      }
-      return prev.map((item) =>
-        item.variantId === variantId ? { ...item, quantity } : item
-      );
+      return prev.flatMap((item) => {
+        if (item.variantId !== variantId) {
+          return item;
+        }
+        const nextQuantity = Math.min(
+          Math.max(quantity, 0),
+          item.stockAvailable,
+        );
+        if (nextQuantity <= 0) {
+          return [];
+        }
+        return { ...item, quantity: nextQuantity };
+      });
     });
   };
 
