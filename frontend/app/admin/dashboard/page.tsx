@@ -39,10 +39,6 @@ const catalogItems = [
 
 const quickActions = [
   {
-    label: 'Sincronizar catálogo',
-    detail: 'Publica cambios al storefront.',
-  },
-  {
     label: 'Ver promociones',
     detail: 'Revisa descuentos activos.',
   },
