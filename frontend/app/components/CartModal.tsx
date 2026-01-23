@@ -18,6 +18,15 @@ export default function CartModal() {
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items],
   );
+  const originalTotal = useMemo(
+    () =>
+      items.reduce(
+        (sum, item) =>
+          sum + (item.originalPrice ?? item.price) * item.quantity,
+        0,
+      ),
+    [items],
+  );
 
   const clearCloseTimeout = () => {
     if (closeTimeoutRef.current) {
@@ -143,9 +152,26 @@ export default function CartModal() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-ink">
-                          ${(item.price * item.quantity).toLocaleString("es-AR")}
-                        </p>
+                        <div className="text-right">
+                          {item.originalPrice &&
+                          item.originalPrice > item.price ? (
+                            <>
+                              <p className="text-[11px] text-slate-400 line-through">
+                                $
+                                {(
+                                  item.originalPrice * item.quantity
+                                ).toLocaleString("es-AR")}
+                              </p>
+                              <p className="text-sm font-semibold text-ink">
+                                ${(item.price * item.quantity).toLocaleString("es-AR")}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm font-semibold text-ink">
+                              ${(item.price * item.quantity).toLocaleString("es-AR")}
+                            </p>
+                          )}
+                        </div>
                         <button
                           type="button"
                           onClick={() => removeItem(item.variantId)}
@@ -161,9 +187,22 @@ export default function CartModal() {
                 <div className="mt-6 rounded-2xl bg-sand p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-500">Total</span>
-                    <span className="text-lg font-semibold text-ink">
-                      ${total.toLocaleString("es-AR")}
-                    </span>
+                    <div className="text-right">
+                      {originalTotal > total ? (
+                        <>
+                          <span className="block text-[11px] text-slate-400 line-through">
+                            ${originalTotal.toLocaleString("es-AR")}
+                          </span>
+                          <span className="text-lg font-semibold text-ink">
+                            ${total.toLocaleString("es-AR")}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-lg font-semibold text-ink">
+                          ${total.toLocaleString("es-AR")}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="mt-4 flex gap-3">
                     <Link

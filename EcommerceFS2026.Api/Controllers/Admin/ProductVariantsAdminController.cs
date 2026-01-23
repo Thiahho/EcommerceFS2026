@@ -72,6 +72,7 @@ public class ProductVariantsAdminController : ControllerBase
     public async Task<IActionResult> Update(int id, AdminProductVariantRequest request, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
+            .Include(item => item.Product)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
         if (variant is null)
@@ -100,6 +101,7 @@ public class ProductVariantsAdminController : ControllerBase
     public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
+            .Include(item => item.Product)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
         if (variant is null)
@@ -120,6 +122,7 @@ public class ProductVariantsAdminController : ControllerBase
     public async Task<IActionResult> Activate(int id, CancellationToken cancellationToken)
     {
         var variant = await _dbContext.ProductVariants
+            .Include(item => item.Product)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
         if (variant is null)
@@ -133,6 +136,67 @@ public class ProductVariantsAdminController : ControllerBase
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Ok(variant);
+    }
+
+    [HttpGet("stock")]
+    [Authorize(Roles = "Admin,Empleado")]
+    public async Task<IActionResult> GetStockOverview(CancellationToken cancellationToken)
+    {
+        var variants = await _dbContext.ProductVariants
+            .AsNoTracking()
+            .Include(variant => variant.Product)
+            .OrderBy(variant => variant.Product.Name)
+            .ThenBy(variant => variant.Sku)
+            .Select(variant => new AdminStockVariantDto
+            {
+                Id = variant.Id,
+                ProductId = variant.ProductId,
+                ProductName = variant.Product.Name,
+                Sku = variant.Sku,
+                Color = variant.Color,
+                Ram = variant.Ram,
+                Storage = variant.Storage,
+                StockActual = variant.StockActual,
+                StockReserved = variant.StockReserved,
+                Active = variant.Active
+            })
+            .ToListAsync(cancellationToken);
+
+        return Ok(variants);
+    }
+
+    [HttpPatch("{id:int}/stock")]
+    [Authorize(Roles = "Admin,Empleado")]
+    public async Task<IActionResult> UpdateStock(int id, AdminStockUpdateRequest request, CancellationToken cancellationToken)
+    {
+        var variant = await _dbContext.ProductVariants
+            .Include(item => item.Product)
+            .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+
+        if (variant is null)
+        {
+            return NotFound();
+        }
+
+        variant.StockActual = request.StockActual;
+        variant.StockReserved = request.StockReserved;
+        variant.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok(new AdminStockVariantDto
+        {
+            Id = variant.Id,
+            ProductId = variant.ProductId,
+            ProductName = variant.Product?.Name ?? string.Empty,
+            Sku = variant.Sku,
+            Color = variant.Color,
+            Ram = variant.Ram,
+            Storage = variant.Storage,
+            StockActual = variant.StockActual,
+            StockReserved = variant.StockReserved,
+            Active = variant.Active
+        });
     }
 
     [HttpGet("product/{productId:int}")]
