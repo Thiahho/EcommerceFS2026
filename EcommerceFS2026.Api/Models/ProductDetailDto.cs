@@ -8,5 +8,8 @@ public record ProductDetailDto(
     string Slug,
     string Category,
     bool Active,
+    bool HasActivePromotion,
+    int? ActivePromotionType,
+    decimal? ActivePromotionValue,
     IReadOnlyCollection<ProductVariantDto> Variants
 );
