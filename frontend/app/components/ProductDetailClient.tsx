@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { ProductDetail } from "../lib/types";
@@ -13,7 +13,12 @@ export default function ProductDetailClient({
 }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
+  const [mounted, setMounted] = useState(false);
   const { addItem } = useCart();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const variantsWithImage = product.variants.filter((v) => v.imagePublicId);
   const formatVariantLabel = (
@@ -112,7 +117,7 @@ export default function ProductDetailClient({
 
         <div className="flex items-center justify-between">
           <span className="text-2xl font-semibold text-ink">
-            ${selectedVariant.price.toLocaleString("es-AR")}
+            ${mounted ? selectedVariant.price.toLocaleString("es-AR") : selectedVariant.price}
           </span>
           <span className="text-xs font-semibold text-slate-500">
             Stock disponible:{" "}
