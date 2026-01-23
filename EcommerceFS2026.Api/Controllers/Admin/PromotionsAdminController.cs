@@ -31,6 +31,27 @@ public class PromotionsAdminController : ControllerBase
         return Ok(promotions);
     }
 
+    [HttpGet("{id:int}/products")]
+    [Authorize(Roles = "Admin,Empleado")]
+    public async Task<IActionResult> GetProducts(int id, CancellationToken cancellationToken)
+    {
+        var products = await _dbContext.PromotionProducts
+            .AsNoTracking()
+            .Include(pp => pp.Product)
+            .Where(pp => pp.PromotionId == id)
+            .OrderBy(pp => pp.Product.Name)
+            .Select(pp => new AdminPromotionProductDto
+            {
+                ProductId = pp.ProductId,
+                Name = pp.Product.Name,
+                Brand = pp.Product.Brand,
+                Slug = pp.Product.Slug
+            })
+            .ToListAsync(cancellationToken);
+
+        return Ok(products);
+    }
+
     [HttpPost]
     [Authorize(Roles = "Admin,Empleado")]
     public async Task<IActionResult> Create(AdminPromotionRequest request, CancellationToken cancellationToken)

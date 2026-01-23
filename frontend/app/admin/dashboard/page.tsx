@@ -21,6 +21,11 @@ const catalogItems = [
     href: '/admin/categorias',
   },
   {
+    title: 'Promociones',
+    description: 'Configura descuentos, precios especiales y 2x1.',
+    href: '/admin/promociones',
+  },
+  {
     title: 'Variantes',
     description: 'Define stock, precio y SKU por variante.',
     href: '/admin/variantes',

@@ -81,3 +81,23 @@ export type AdminStockVariant = {
   stockReserved: number;
   active: boolean;
 };
+
+export type AdminPromotion = {
+  id: number;
+  name: string;
+  description: string;
+  type: number;
+  value: number;
+  code: string | null;
+  startsAt: string;
+  endsAt: string;
+  active: boolean;
+  combinable: boolean;
+};
+
+export type AdminPromotionProduct = {
+  productId: number;
+  name: string;
+  brand: string;
+  slug: string;
+};
