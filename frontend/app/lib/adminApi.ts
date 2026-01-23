@@ -1,6 +1,6 @@
 const defaultBaseUrl = 'http://localhost:51364';
 
-const baseUrl =
+export const adminBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   (typeof window !== 'undefined'
     ? `http://${window.location.hostname}:51364`
@@ -15,7 +15,7 @@ export async function adminFetch<T>(
   token: string,
   options: AdminFetchOptions = {},
 ) {
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(`${adminBaseUrl}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
