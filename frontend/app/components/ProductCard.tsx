@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
@@ -8,6 +11,12 @@ export default function ProductCard({
 }: {
   product: ProductCatalogItem;
 }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <article className="group flex flex-col rounded-3xl bg-white p-5 shadow-soft transition hover:-translate-y-1">
       <div className="object-contain p-2">
@@ -44,7 +53,7 @@ export default function ProductCard({
       </div>
       <div className="mt-4 flex items-center justify-between">
         <span className="text-lg font-semibold text-ink">
-          ${product.minPrice.toLocaleString("es-AR")}
+          ${mounted ? product.minPrice.toLocaleString("es-AR") : product.minPrice}
         </span>
         <Link
           href={`/producto/${product.slug}`}

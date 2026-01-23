@@ -1,3 +1,5 @@
+"use client";
+  
 import Link from 'next/link';
 import { fetchCatalog } from './lib/api';
 import ProductCard from './components/ProductCard';
