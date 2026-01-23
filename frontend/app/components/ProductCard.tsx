@@ -73,7 +73,7 @@ export default function ProductCard({
   return (
     <article className="group flex flex-col rounded-3xl bg-white p-5 shadow-soft transition hover:-translate-y-1">
       <div className="object-contain p-2">
-        {product.imagePublicId ? (
+        {mounted && product.imagePublicId ? (
           <CldImage
             src={product.imagePublicId}
             alt={product.name}
@@ -83,13 +83,19 @@ export default function ProductCard({
             className="object-contain"
           />
         ) : (
-          <Image
-            src={`https://placehold.co/400x400?text=${encodeURIComponent(product.name)}`}
-            alt={product.name}
-            width={220}
-            height={220}
-            className="object-contain"
-          />
+          <div className="flex h-[220px] w-[220px] items-center justify-center bg-slate-100 rounded-xl">
+            {!mounted ? (
+              <span className="text-slate-400 text-sm">Cargando...</span>
+            ) : (
+              <Image
+                src={`https://placehold.co/400x400?text=${encodeURIComponent(product.name)}`}
+                alt={product.name}
+                width={220}
+                height={220}
+                className="object-contain"
+              />
+            )}
+          </div>
         )}
         {product.hasActivePromotion && (
           <span className="badge absolute left-3 top-3 bg-coral text-white">
@@ -105,30 +111,21 @@ export default function ProductCard({
         <p className="mt-2 text-sm text-slate-500">{product.category}</p>
       </div>
       <div className="mt-4 flex items-center justify-between">
-        <div className="flex flex-col">
+        <div className="flex flex-col" suppressHydrationWarning>
           {product.hasActivePromotion &&
           product.activePromotionType !== 4 &&
           discountedPrice < product.minPrice ? (
             <>
-              <span className="text-xs text-slate-400 line-through">
-                $
-                {mounted
-                  ? product.minPrice.toLocaleString("es-AR")
-                  : product.minPrice}
+              <span className="text-xs text-slate-400 line-through" suppressHydrationWarning>
+                ${product.minPrice.toLocaleString("es-AR")}
               </span>
-              <span className="text-lg font-semibold text-ink">
-                $
-                {mounted
-                  ? discountedPrice.toLocaleString("es-AR")
-                  : discountedPrice}
+              <span className="text-lg font-semibold text-ink" suppressHydrationWarning>
+                ${discountedPrice.toLocaleString("es-AR")}
               </span>
             </>
           ) : (
-            <span className="text-lg font-semibold text-ink">
-              $
-              {mounted
-                ? product.minPrice.toLocaleString("es-AR")
-                : product.minPrice}
+            <span className="text-lg font-semibold text-ink" suppressHydrationWarning>
+              ${product.minPrice.toLocaleString("es-AR")}
             </span>
           )}
         </div>

@@ -57,6 +57,7 @@ export default function ProductDetailClient({
 }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
+  const [mounted, setMounted] = useState(false);
   const { addItem } = useCart();
 
   const variantsWithImage = product.variants.filter((v) => v.imagePublicId);
@@ -74,6 +75,10 @@ export default function ProductDetailClient({
     product.activePromotionType,
     product.activePromotionValue,
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setQuantity((prev) => {
@@ -100,7 +105,7 @@ export default function ProductDetailClient({
         <div className="relative w-full overflow-hidden rounded-3xl bg-transparent">
           {/* hace el cuadro siempre cuadrado y evita saltos */}
           <div className="relative aspect-square w-full">
-            {selectedVariant?.imagePublicId ? (
+            {mounted && selectedVariant?.imagePublicId ? (
               <CldImage
                 src={selectedVariant.imagePublicId}
                 alt={product.name}
@@ -108,6 +113,10 @@ export default function ProductDetailClient({
                 sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-contain p-6 sm:p-8 md:p-10"
               />
+            ) : !mounted ? (
+              <div className="flex h-full w-full items-center justify-center bg-slate-100 rounded-xl">
+                <span className="text-slate-400 text-sm">Cargando...</span>
+              </div>
             ) : (
               <Image
                 src={`https://placehold.co/800x800?text=${encodeURIComponent(product.name)}`}
@@ -120,7 +129,7 @@ export default function ProductDetailClient({
           </div>
         </div>
 
-        {variantsWithImage.length > 1 && (
+        {mounted && variantsWithImage.length > 1 && (
           <div className="grid grid-cols-4 gap-3">
             {variantsWithImage.map((variant) => (
               <button
@@ -190,15 +199,15 @@ export default function ProductDetailClient({
             product.activePromotionType !== 4 &&
             discountedPrice < selectedVariant.price ? (
               <>
-                <span className="text-xs text-slate-400 line-through">
+                <span className="text-xs text-slate-400 line-through" suppressHydrationWarning>
                   ${selectedVariant.price.toLocaleString("es-AR")}
                 </span>
-                <span className="text-2xl font-semibold text-ink">
+                <span className="text-2xl font-semibold text-ink" suppressHydrationWarning>
                   ${discountedPrice.toLocaleString("es-AR")}
                 </span>
               </>
             ) : (
-              <span className="text-2xl font-semibold text-ink">
+              <span className="text-2xl font-semibold text-ink" suppressHydrationWarning>
                 ${selectedVariant.price.toLocaleString("es-AR")}
               </span>
             )}

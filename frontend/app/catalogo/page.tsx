@@ -93,7 +93,7 @@ export default function CatalogPage() {
        {/* h-fit: hace que el fondo y el borde terminen donde termina el último input.
   sticky top-10: (opcional) hace que el filtro se quede fijo al bajar scroll.
 */}
-<aside className="card h-fit space-y-6 md:sticky md:top-10">
+<aside className="card h-fit space-y-6 md:sticky md:top-10" suppressHydrationWarning>
   <div>
     <label className="text-xs font-semibold uppercase text-slate-500">
       Marca
@@ -102,6 +102,7 @@ export default function CatalogPage() {
       className="mt-2 w-full rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
       value={brand}
       onChange={(event) => setBrand(event.target.value)}
+      suppressHydrationWarning
     >
       <option value="">Todas</option>
       {brands.map((item) => (
@@ -112,8 +113,6 @@ export default function CatalogPage() {
     </select>
   </div>
 
-  {/* ... resto de tus filtros (Categoría, Precio, Checkboxes) ... */}
-  
   <div>
     <label className="text-xs font-semibold uppercase text-slate-500">
       Categoría
@@ -122,6 +121,7 @@ export default function CatalogPage() {
       className="mt-2 w-full rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
       value={category}
       onChange={(event) => setCategory(event.target.value)}
+      suppressHydrationWarning
     >
       <option value="">Todas</option>
       {categories.map((item) => (
@@ -141,12 +141,14 @@ export default function CatalogPage() {
       placeholder="Mínimo"
       value={minPrice}
       onChange={(event) => setMinPrice(event.target.value)}
+      suppressHydrationWarning
     />
     <input
       className="rounded-2xl border border-cloud bg-white px-4 py-2 text-sm"
       placeholder="Máximo"
       value={maxPrice}
       onChange={(event) => setMaxPrice(event.target.value)}
+      suppressHydrationWarning
     />
   </div>
 
@@ -157,6 +159,7 @@ export default function CatalogPage() {
         className="rounded border-cloud text-ink focus:ring-ink"
         checked={promo}
         onChange={(event) => setPromo(event.target.checked)}
+        suppressHydrationWarning
       />
       Solo promos activas
     </label>
@@ -167,6 +170,7 @@ export default function CatalogPage() {
         className="rounded border-cloud text-ink focus:ring-ink"
         checked={stock}
         onChange={(event) => setStock(event.target.checked)}
+        suppressHydrationWarning
       />
       Solo con stock
     </label>
