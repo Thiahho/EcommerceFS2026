@@ -1,25 +1,52 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "../hooks/useCart";
 
 const cartOpenEvent = "cart:open";
+const minimumOpenMs = 3000;
 
 export default function CartModal() {
   const { items, total, removeItem, updateItemQuantity } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openUntilRef = useRef(0);
 
   const itemsCount = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items],
   );
 
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const openCart = () => {
+    clearCloseTimeout();
+    setIsOpen(true);
+    openUntilRef.current = Date.now() + minimumOpenMs;
+  };
+
+  const scheduleClose = () => {
+    clearCloseTimeout();
+    const remaining = Math.max(openUntilRef.current - Date.now(), 0);
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, remaining);
+  };
+
   useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
+    const handleOpen = () => openCart();
     window.addEventListener(cartOpenEvent, handleOpen);
-    return () => window.removeEventListener(cartOpenEvent, handleOpen);
+    return () => {
+      window.removeEventListener(cartOpenEvent, handleOpen);
+      clearCloseTimeout();
+    };
   }, []);
 
   const handleDecrease = (variantId: number, quantity: number) => {
@@ -31,29 +58,14 @@ export default function CartModal() {
   };
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="relative inline-flex items-center gap-2 rounded-full border border-cloud px-4 py-2 text-xs font-semibold text-ink"
-      >
-        Carrito
-        {itemsCount > 0 && (
-          <span className="absolute -right-2 -top-2 rounded-full bg-moss px-2 py-0.5 text-[10px] font-semibold text-white">
-            {itemsCount}
-          </span>
-        )}
-      </button>
-
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-end bg-ink/40 p-4 sm:p-6">
-          <button
-            type="button"
-            className="absolute inset-0 h-full w-full"
-            aria-label="Cerrar carrito"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+    <div
+      className="fixed bottom-6 right-6 z-50 flex items-end"
+      onMouseEnter={openCart}
+      onMouseLeave={scheduleClose}
+    >
+      <div className="flex flex-col items-end gap-3">
+        {isOpen && (
+          <div className="w-80 rounded-3xl bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-ink">Tu carrito</h2>
@@ -82,7 +94,7 @@ export default function CartModal() {
                       key={item.variantId}
                       className="flex items-center gap-4 rounded-2xl border border-cloud p-3"
                     >
-                      <div className="h-16 w-16 overflow-hidden rounded-xl bg-sand">
+                      <div className="h-14 w-14 overflow-hidden rounded-xl bg-sand">
                         <img
                           src={
                             item.imagePublicId && cloudName
@@ -169,8 +181,36 @@ export default function CartModal() {
               </>
             )}
           </div>
-        </div>
-      )}
-    </>
+        )}
+
+        <button
+          type="button"
+          onClick={openCart}
+          className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white shadow-lg"
+          aria-label="Abrir carrito"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M7 4h-2l-1 2" />
+            <path d="M5 6h14l-1.6 8.2a2 2 0 0 1-2 1.6h-7a2 2 0 0 1-2-1.6L4 6" />
+            <path d="M9.5 20a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z" />
+            <path d="M16.5 20a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z" />
+          </svg>
+          {itemsCount > 0 && (
+            <span className="absolute -right-1 -top-1 rounded-full bg-moss px-2 py-0.5 text-[10px] font-semibold text-white">
+              {itemsCount}
+            </span>
+          )}
+        </button>
+      </div>
+    </div>
   );
 }
