@@ -238,13 +238,21 @@ export default function ProductDetailClient({
               if (availableStock <= 0 || quantity <= 0) {
                 return;
               }
+              const shouldApplyDiscount =
+                hasPromotion &&
+                product.activePromotionType !== 4 &&
+                discountedPrice < selectedVariant.price;
+              const finalPrice = shouldApplyDiscount
+                ? discountedPrice
+                : selectedVariant.price;
               addItem({
                 id: product.id,
                 name: product.name,
                 slug: product.slug,
                 variantId: selectedVariant.id,
                 variantLabel: formatVariantLabel(selectedVariant, " / "),
-                price: selectedVariant.price,
+                price: finalPrice,
+                originalPrice: shouldApplyDiscount ? selectedVariant.price : null,
                 quantity: Math.min(quantity, availableStock),
                 stockAvailable: availableStock,
                 imagePublicId: selectedVariant.imagePublicId ?? null,

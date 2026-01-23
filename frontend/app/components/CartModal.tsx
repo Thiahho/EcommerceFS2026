@@ -143,9 +143,26 @@ export default function CartModal() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-ink">
-                          ${(item.price * item.quantity).toLocaleString("es-AR")}
-                        </p>
+                        <div className="text-right">
+                          {item.originalPrice &&
+                          item.originalPrice > item.price ? (
+                            <>
+                              <p className="text-[11px] text-slate-400 line-through">
+                                $
+                                {(
+                                  item.originalPrice * item.quantity
+                                ).toLocaleString("es-AR")}
+                              </p>
+                              <p className="text-sm font-semibold text-ink">
+                                ${(item.price * item.quantity).toLocaleString("es-AR")}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm font-semibold text-ink">
+                              ${(item.price * item.quantity).toLocaleString("es-AR")}
+                            </p>
+                          )}
+                        </div>
                         <button
                           type="button"
                           onClick={() => removeItem(item.variantId)}
