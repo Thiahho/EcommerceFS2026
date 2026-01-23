@@ -44,10 +44,13 @@ export default function AdminPromotionsPage() {
   const [assignedProducts, setAssignedProducts] = useState<
     AdminPromotionProduct[]
   >([]);
+  const [selectedPromotion, setSelectedPromotion] =
+    useState<AdminPromotion | null>(null);
   const [selectedPromotionId, setSelectedPromotionId] = useState<number | null>(
     null,
   );
   const [selectedProductId, setSelectedProductId] = useState("");
+  const [assignProductId, setAssignProductId] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -115,6 +118,11 @@ export default function AdminPromotionsPage() {
       return;
     }
 
+    if (!selectedProductId && !selectedPromotionId) {
+      setStatus("Seleccioná el producto que querés promocionar.");
+      return;
+    }
+
     const payload = {
       ...form,
       code: form.code ? form.code : null,
@@ -139,6 +147,7 @@ export default function AdminPromotionsPage() {
         setPromotions((prev) =>
           prev.map((item) => (item.id === updated.id ? updated : item)),
         );
+        setSelectedPromotion(updated);
         setStatus("Promoción actualizada.");
       } else {
         const created = await adminFetch<AdminPromotion>(
@@ -151,6 +160,19 @@ export default function AdminPromotionsPage() {
         );
         setPromotions((prev) => [created, ...prev]);
         setSelectedPromotionId(created.id);
+        setSelectedPromotion(created);
+        if (selectedProductId) {
+          await adminFetch(`/api/admin/promotions/${created.id}/products`, token, {
+            method: "POST",
+            body: JSON.stringify({ productId: Number(selectedProductId) }),
+          });
+          const response = await adminFetch<AdminPromotionProduct[]>(
+            `/api/admin/promotions/${created.id}/products`,
+            token,
+          );
+          setAssignedProducts(response);
+          setSelectedProductId("");
+        }
         setStatus("Promoción creada.");
       }
     } catch (error) {
@@ -166,6 +188,7 @@ export default function AdminPromotionsPage() {
 
   const handleEdit = (promotion: AdminPromotion) => {
     setSelectedPromotionId(promotion.id);
+    setSelectedPromotion(promotion);
     setForm({
       name: promotion.name,
       description: promotion.description,
@@ -180,7 +203,7 @@ export default function AdminPromotionsPage() {
   };
 
   const handleAssignProduct = async () => {
-    if (!token || !selectedPromotionId || !selectedProductId) {
+    if (!token || !selectedPromotionId || !assignProductId) {
       return;
     }
 
@@ -191,7 +214,7 @@ export default function AdminPromotionsPage() {
         token,
         {
           method: "POST",
-          body: JSON.stringify({ productId: Number(selectedProductId) }),
+          body: JSON.stringify({ productId: Number(assignProductId) }),
         },
       );
       const response = await adminFetch<AdminPromotionProduct[]>(
@@ -199,7 +222,7 @@ export default function AdminPromotionsPage() {
         token,
       );
       setAssignedProducts(response);
-      setSelectedProductId("");
+      setAssignProductId("");
     } catch (error) {
       setStatus(
         error instanceof Error
@@ -239,6 +262,15 @@ export default function AdminPromotionsPage() {
     [form.type],
   );
 
+  const clearSelection = () => {
+    setSelectedPromotionId(null);
+    setSelectedPromotion(null);
+    setAssignedProducts([]);
+    setForm(emptyForm);
+    setSelectedProductId("");
+    setAssignProductId("");
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -267,93 +299,135 @@ export default function AdminPromotionsPage() {
         </Link>
       </header>
 
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="card space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-ink">Promociones</h2>
-            <p className="text-xs text-slate-500">
-              Seleccioná una promoción para editar o asignar productos.
-            </p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="text-left text-xs uppercase text-slate-400">
-                <tr>
-                  <th className="py-2">Nombre</th>
-                  <th className="py-2">Tipo</th>
-                  <th className="py-2">Valor</th>
-                  <th className="py-2">Vigencia</th>
-                  <th className="py-2">Estado</th>
-                  <th className="py-2">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {promotions.map((promotion) => {
-                  const promotionType =
-                    promotionTypes.find((item) => item.value === promotion.type)
-                      ?.label ?? "Promoción";
-                  const valueLabel =
-                    promotion.type === 4
-                      ? "2x1"
-                      : promotion.type === 1
-                        ? `${promotion.value}%`
-                        : promotion.type === 2
-                          ? `$${promotion.value}`
-                          : `$${promotion.value}`;
+      <section className="card space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-ink">
+            Promociones existentes
+          </h2>
+          <p className="text-xs text-slate-500">
+            Podés seleccionar una promoción para editarla o crear una nueva.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="text-left text-xs uppercase text-slate-400">
+              <tr>
+                <th className="py-2">Nombre</th>
+                <th className="py-2">Tipo</th>
+                <th className="py-2">Valor</th>
+                <th className="py-2">Vigencia</th>
+                <th className="py-2">Estado</th>
+                <th className="py-2">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {promotions.map((promotion) => {
+                const promotionType =
+                  promotionTypes.find((item) => item.value === promotion.type)
+                    ?.label ?? "Promoción";
+                const valueLabel =
+                  promotion.type === 4
+                    ? "2x1"
+                    : promotion.type === 1
+                      ? `${promotion.value}%`
+                      : promotion.type === 2
+                        ? `$${promotion.value}`
+                        : `$${promotion.value}`;
 
-                  return (
-                    <tr key={promotion.id} className="text-slate-600">
-                      <td className="py-3 font-semibold text-ink">
-                        {promotion.name}
-                      </td>
-                      <td className="py-3">{promotionType}</td>
-                      <td className="py-3">{valueLabel}</td>
-                      <td className="py-3 text-xs">
-                        {new Date(promotion.startsAt).toLocaleDateString()} -{" "}
-                        {new Date(promotion.endsAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-3">
-                        <span
-                          className={
-                            promotion.active
-                              ? "text-moss font-semibold"
-                              : "text-slate-400"
-                          }
-                        >
-                          {promotion.active ? "Activa" : "Inactiva"}
-                        </span>
-                      </td>
-                      <td className="py-3">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(promotion)}
-                          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-ink"
-                        >
-                          Editar
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {promotions.length === 0 ? (
-                  <tr>
-                    <td className="py-4 text-sm text-slate-400" colSpan={6}>
-                      Todavía no hay promociones cargadas.
+                return (
+                  <tr key={promotion.id} className="text-slate-600">
+                    <td className="py-3 font-semibold text-ink">
+                      {promotion.name}
+                    </td>
+                    <td className="py-3">{promotionType}</td>
+                    <td className="py-3">{valueLabel}</td>
+                    <td className="py-3 text-xs">
+                      {new Date(promotion.startsAt).toLocaleDateString()} -{" "}
+                      {new Date(promotion.endsAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3">
+                      <span
+                        className={
+                          promotion.active
+                            ? "text-moss font-semibold"
+                            : "text-slate-400"
+                        }
+                      >
+                        {promotion.active ? "Activa" : "Inactiva"}
+                      </span>
+                    </td>
+                    <td className="py-3">
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(promotion)}
+                        className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-ink"
+                      >
+                        Editar
+                      </button>
                     </td>
                   </tr>
-                ) : null}
-              </tbody>
-            </table>
+                );
+              })}
+              {promotions.length === 0 ? (
+                <tr>
+                  <td className="py-4 text-sm text-slate-400" colSpan={6}>
+                    Todavía no hay promociones cargadas.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={clearSelection}
+            className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600"
+          >
+            Crear nueva promoción
+          </button>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="card space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-ink">1. Elegí producto</h2>
+            <p className="text-xs text-slate-500">
+              Primero seleccioná el producto que querés promocionar.
+            </p>
           </div>
+          <select
+            value={selectedProductId}
+            onChange={(event) => setSelectedProductId(event.target.value)}
+            className="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
+          >
+            <option value="">Seleccioná un producto</option>
+            {products.map((product) => (
+              <option key={product.id} value={product.id}>
+                {product.name}
+              </option>
+            ))}
+          </select>
+          {selectedPromotion ? (
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs text-slate-500">
+              Editando: <span className="font-semibold">{selectedPromotion.name}</span>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500">
+              Si vas a crear una nueva promoción, este producto se asignará al
+              guardar.
+            </p>
+          )}
         </div>
 
         <div className="card space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-ink">
-              {selectedPromotionId ? "Editar promoción" : "Crear promoción"}
+              2. Configurá la promoción
             </h2>
             <p className="text-xs text-slate-500">
-              Configurá vigencia, tipo y el valor de la promoción.
+              Completá los datos de la promoción para ese producto.
             </p>
           </div>
           <div className="grid gap-3 text-sm">
@@ -490,13 +564,13 @@ export default function AdminPromotionsPage() {
             Productos en promoción
           </h2>
           <p className="text-xs text-slate-500">
-            Asigná productos a la promoción seleccionada.
+            Asigná productos extra a la promoción seleccionada.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <select
-            value={selectedProductId}
-            onChange={(event) => setSelectedProductId(event.target.value)}
+            value={assignProductId}
+            onChange={(event) => setAssignProductId(event.target.value)}
             className="min-w-[240px] rounded-2xl border border-slate-200 px-4 py-3 text-sm"
           >
             <option value="">Seleccioná un producto</option>
@@ -509,7 +583,7 @@ export default function AdminPromotionsPage() {
           <button
             type="button"
             onClick={handleAssignProduct}
-            disabled={!selectedPromotionId || !selectedProductId}
+            disabled={!selectedPromotionId || !assignProductId}
             className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
           >
             Agregar a promoción
