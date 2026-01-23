@@ -1,4 +1,6 @@
 using EcommerceFS2026.Api.Models;
+using EcommerceFS2026.Domain.Entities;
+using EcommerceFS2026.Domain.Enums;
 using EcommerceFS2026.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -71,27 +73,35 @@ public class ProductsController : ControllerBase
                     && pp.Promotion.EndsAt >= now));
         }
 
-        var products = await query
-            .Select(product => new ProductCatalogItemDto(
-                product.Id,
-                product.Name,
-                product.Brand,
-                product.Slug,
-                product.Category != null ? product.Category.Name : string.Empty,
-                product.Variants.Count == 0 ? 0 : product.Variants.Min(variant => variant.Price),
-                product.Variants.Any(variant => variant.StockActual - variant.StockReserved > 0),
-                product.PromotionProducts.Any(pp =>
-                    pp.Promotion != null
-                    && pp.Promotion.Active
-                    && pp.Promotion.StartsAt <= now
-                    && pp.Promotion.EndsAt >= now),
-                product.Variants
-                    .Where(v => v.Active && v.ImagePublicId != null)
-                    .Select(v => v.ImagePublicId)
-                    .FirstOrDefault()))
-            .ToListAsync(cancellationToken);
+        var products = await query.ToListAsync(cancellationToken);
 
-        return Ok(products);
+        var catalogItems = products
+            .Select(product =>
+            {
+                var minPrice = product.Variants.Count == 0
+                    ? 0
+                    : product.Variants.Min(variant => variant.Price);
+                var promotion = GetBestPromotion(product, minPrice, now);
+
+                return new ProductCatalogItemDto(
+                    product.Id,
+                    product.Name,
+                    product.Brand,
+                    product.Slug,
+                    product.Category != null ? product.Category.Name : string.Empty,
+                    minPrice,
+                    product.Variants.Any(variant => variant.StockActual - variant.StockReserved > 0),
+                    promotion != null,
+                    promotion?.Type,
+                    promotion?.Value,
+                    product.Variants
+                        .Where(v => v.Active && v.ImagePublicId != null)
+                        .Select(v => v.ImagePublicId)
+                        .FirstOrDefault());
+            })
+            .ToList();
+
+        return Ok(catalogItems);
     }
 
     [HttpGet("{slug}")]
@@ -101,12 +111,19 @@ public class ProductsController : ControllerBase
             .AsNoTracking()
             .Include(item => item.Category)
             .Include(item => item.Variants)
+            .Include(item => item.PromotionProducts)
+            .ThenInclude(promotionProduct => promotionProduct.Promotion)
             .FirstOrDefaultAsync(item => item.Slug == slug && item.Active, cancellationToken);
 
         if (product is null)
         {
             return NotFound();
         }
+
+        var bestPromotion = GetBestPromotion(
+            product,
+            product.Variants.Count == 0 ? 0 : product.Variants.Min(variant => variant.Price),
+            DateTimeOffset.UtcNow);
 
         var detail = new ProductDetailDto(
             product.Id,
@@ -116,6 +133,9 @@ public class ProductsController : ControllerBase
             product.Slug,
             product.Category?.Name ?? string.Empty,
             product.Active,
+            bestPromotion != null,
+            bestPromotion?.Type,
+            bestPromotion?.Value,
             product.Variants
                 .Where(variant => variant.Active)
                 .Select(variant => new ProductVariantDto(
@@ -154,5 +174,50 @@ public class ProductsController : ControllerBase
             .ToListAsync(cancellationToken);
 
         return Ok(variants);
+    }
+
+    private static Promotion? GetBestPromotion(Product product, decimal basePrice, DateTimeOffset now)
+    {
+        var activePromotions = product.PromotionProducts
+            .Select(pp => pp.Promotion)
+            .Where(promotion =>
+                promotion != null
+                && promotion.Active
+                && promotion.StartsAt <= now
+                && promotion.EndsAt >= now)
+            .Select(promotion => promotion!)
+            .ToList();
+
+        if (activePromotions.Count == 0 || basePrice <= 0)
+        {
+            return null;
+        }
+
+        Promotion? bestPromotion = null;
+        decimal bestDiscount = 0;
+
+        foreach (var promotion in activePromotions)
+        {
+            var discount = GetDiscountAmount(basePrice, promotion.Type, promotion.Value);
+            if (discount > bestDiscount)
+            {
+                bestDiscount = discount;
+                bestPromotion = promotion;
+            }
+        }
+
+        return bestPromotion;
+    }
+
+    private static decimal GetDiscountAmount(decimal basePrice, PromotionType type, decimal value)
+    {
+        return type switch
+        {
+            PromotionType.Percentage => basePrice * (value / 100m),
+            PromotionType.FixedAmount => value,
+            PromotionType.SpecialPrice => basePrice > value ? basePrice - value : 0,
+            PromotionType.BuyOneGetOne => basePrice / 2m,
+            _ => 0
+        };
     }
 }

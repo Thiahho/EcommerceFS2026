@@ -6,6 +6,50 @@ import { CldImage } from "next-cloudinary";
 import { ProductDetail } from "../lib/types";
 import { useCart } from "../hooks/useCart";
 
+const getPromotionLabel = (
+  type: number | null,
+  value: number | null,
+) => {
+  if (!type) {
+    return null;
+  }
+  switch (type) {
+    case 1:
+      return value ? `${value}% OFF` : "Promo";
+    case 2:
+      return value ? `$${value} OFF` : "Descuento";
+    case 3:
+      return value ? `$${value} especial` : "Precio especial";
+    case 4:
+      return "2x1";
+    default:
+      return "Promo";
+  }
+};
+
+const getDiscountedPrice = (
+  price: number,
+  type: number | null,
+  value: number | null,
+) => {
+  if (!type || value === null) {
+    return price;
+  }
+
+  switch (type) {
+    case 1:
+      return Math.max(price - price * (value / 100), 0);
+    case 2:
+      return Math.max(price - value, 0);
+    case 3:
+      return Math.max(value, 0);
+    case 4:
+      return price;
+    default:
+      return price;
+  }
+};
+
 export default function ProductDetailClient({
   product,
 }: {
@@ -19,6 +63,15 @@ export default function ProductDetailClient({
   const availableStock = Math.max(
     selectedVariant.stockActual - selectedVariant.stockReserved,
     0,
+  );
+  const promotionLabel = getPromotionLabel(
+    product.activePromotionType,
+    product.activePromotionValue,
+  );
+  const discountedPrice = getDiscountedPrice(
+    selectedVariant.price,
+    product.activePromotionType,
+    product.activePromotionValue,
   );
 
   useEffect(() => {
@@ -94,7 +147,14 @@ export default function ProductDetailClient({
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <span className="badge bg-moss/10 text-moss">{product.category}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="badge bg-moss/10 text-moss">{product.category}</span>
+            {product.hasActivePromotion ? (
+              <span className="badge bg-coral/10 text-coral">
+                {promotionLabel ?? "Promo activa"}
+              </span>
+            ) : null}
+          </div>
           <h1 className="text-3xl font-semibold text-ink">{product.name}</h1>
           <p className="text-sm text-slate-500">{product.brand}</p>
         </div>
@@ -123,15 +183,35 @@ export default function ProductDetailClient({
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-semibold text-ink">
-            ${selectedVariant.price.toLocaleString("es-AR")}
-          </span>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            {product.hasActivePromotion &&
+            product.activePromotionType !== 4 &&
+            discountedPrice < selectedVariant.price ? (
+              <>
+                <span className="text-xs text-slate-400 line-through">
+                  ${selectedVariant.price.toLocaleString("es-AR")}
+                </span>
+                <span className="text-2xl font-semibold text-ink">
+                  ${discountedPrice.toLocaleString("es-AR")}
+                </span>
+              </>
+            ) : (
+              <span className="text-2xl font-semibold text-ink">
+                ${selectedVariant.price.toLocaleString("es-AR")}
+              </span>
+            )}
+          </div>
           <span className="text-xs font-semibold text-slate-500">
             Stock disponible:{" "}
             {selectedVariant.stockActual - selectedVariant.stockReserved}
           </span>
         </div>
+        {product.hasActivePromotion && product.activePromotionType === 4 ? (
+          <p className="text-xs text-slate-500">
+            Promoción 2x1 activa. Llevás 2 y pagás 1 en el checkout.
+          </p>
+        ) : null}
 
         <div className="flex items-center gap-4">
           <input

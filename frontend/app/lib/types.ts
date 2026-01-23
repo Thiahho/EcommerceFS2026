@@ -7,6 +7,8 @@ export type ProductCatalogItem = {
   minPrice: number;
   hasStock: boolean;
   hasActivePromotion: boolean;
+  activePromotionType: number | null;
+  activePromotionValue: number | null;
   imagePublicId: string | null;
 };
 
@@ -31,6 +33,9 @@ export type ProductDetail = {
   slug: string;
   category: string;
   active: boolean;
+  hasActivePromotion: boolean;
+  activePromotionType: number | null;
+  activePromotionValue: number | null;
   variants: ProductVariant[];
 };
 
