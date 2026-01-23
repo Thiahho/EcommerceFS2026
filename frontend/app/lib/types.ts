@@ -11,7 +11,7 @@ export type ProductCatalogItem = {
 };
 
 export type ProductVariant = {
-  id: string;
+  id: number;
   color: string;
   ram: string;
   storage: string;
@@ -42,5 +42,6 @@ export type CartItem = {
   variantLabel: string;
   price: number;
   quantity: number;
+  stockAvailable: number;
   imagePublicId: string | null;
 };
