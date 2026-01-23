@@ -92,7 +92,7 @@ public class ProductsController : ControllerBase
                     minPrice,
                     product.Variants.Any(variant => variant.StockActual - variant.StockReserved > 0),
                     promotion != null,
-                    (int?)promotion?.Type,
+                    promotion?.Type,
                     promotion?.Value,
                     product.Variants
                         .Where(v => v.Active && v.ImagePublicId != null)
@@ -134,7 +134,7 @@ public class ProductsController : ControllerBase
             product.Category?.Name ?? string.Empty,
             product.Active,
             bestPromotion != null,
-            (int?)bestPromotion?.Type,
+            bestPromotion?.Type,
             bestPromotion?.Value,
             product.Variants
                 .Where(variant => variant.Active)
@@ -188,15 +188,17 @@ public class ProductsController : ControllerBase
             .Select(promotion => promotion!)
             .ToList();
 
-        if (activePromotions.Count == 0 || basePrice <= 0)
+        if (activePromotions.Count == 0)
         {
             return null;
         }
 
-        Promotion? bestPromotion = null;
-        decimal bestDiscount = 0;
+        var bestPromotion = activePromotions[0];
+        var bestDiscount = basePrice > 0
+            ? GetDiscountAmount(basePrice, bestPromotion.Type, bestPromotion.Value)
+            : 0;
 
-        foreach (var promotion in activePromotions)
+        foreach (var promotion in activePromotions.Skip(1))
         {
             var discount = GetDiscountAmount(basePrice, promotion.Type, promotion.Value);
             if (discount > bestDiscount)
