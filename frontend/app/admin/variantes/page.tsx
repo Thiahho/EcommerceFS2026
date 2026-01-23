@@ -470,14 +470,16 @@ export default function AdminVariantsPage() {
                   <CldUploadWidget
                     uploadPreset="ecommerce_variants"
                     onSuccess={(result) => {
-                      if (
-                        result.info &&
-                        typeof result.info === "object" &&
-                        "public_id" in result.info
-                      ) {
-                        setForm((prev) => ({
-                          ...prev,
-                          imagePublicId: result.info.public_id as string,
+                      const info =
+                        result.info && typeof result.info ==="object"
+                        ? result.info : null;
+                        const publicId= 
+                          info && "publicId" in info ? info.public_id : null;
+
+                          if(typeof publicId == "string" && publicId){
+                          setForm((prev) => ({
+                            ...prev,
+                            imagePublicId: publicId,
                         }));
                       }
                     }}

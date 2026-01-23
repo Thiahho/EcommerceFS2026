@@ -1,11 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import { ProductDetail } from "../lib/types";
 import { useCart } from "../hooks/useCart";
+
+const getPromotionLabel = (
+  type: number | null,
+  value: number | null,
+) => {
+  if (!type) {
+    return null;
+  }
+  switch (type) {
+    case 1:
+      return value ? `${value}% OFF` : "Promo";
+    case 2:
+      return value ? `$${value} OFF` : "Descuento";
+    case 3:
+      return value ? `$${value} especial` : "Precio especial";
+    case 4:
+      return "2x1";
+    default:
+      return "Promo";
+  }
+};
+
+const getDiscountedPrice = (
+  price: number,
+  type: number | null,
+  value: number | null,
+) => {
+  if (!type || value === null) {
+    return price;
+  }
+
+  switch (type) {
+    case 1:
+      return Math.max(price - price * (value / 100), 0);
+    case 2:
+      return Math.max(price - value, 0);
+    case 3:
+      return Math.max(value, 0);
+    case 4:
+      return price;
+    default:
+      return price;
+  }
+};
 
 export default function ProductDetailClient({
   product,
@@ -14,10 +57,47 @@ export default function ProductDetailClient({
 }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { addItem } = useCart();
 
   const variantsWithImage = product.variants.filter((v) => v.imagePublicId);
+  const availableStock = Math.max(
+    selectedVariant.stockActual - selectedVariant.stockReserved,
+    0,
+  );
+  const hasPromotion = product.activePromotionType !== null;
+  const promotionLabel = getPromotionLabel(
+    product.activePromotionType,
+    product.activePromotionValue,
+  );
+  const discountedPrice = getDiscountedPrice(
+    selectedVariant.price,
+    product.activePromotionType,
+    product.activePromotionValue,
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setQuantity((prev) => {
+      if (availableStock <= 0) {
+        return 0;
+      }
+      return Math.min(prev || 1, availableStock);
+    });
+  }, [availableStock]);
+  const formatVariantLabel = (
+    variant: ProductDetail["variants"][number],
+    separator = " · ",
+  ) => {
+    const parts = [variant.color, variant.ram, variant.storage]
+      .map((value) => value?.trim())
+      .filter(Boolean);
+
+    return parts.length ? parts.join(separator) : "Variante";
+  };
 
   return (
     <div className="grid gap-10 md:grid-cols-[1.1fr_1fr]">
@@ -25,7 +105,7 @@ export default function ProductDetailClient({
         <div className="relative w-full overflow-hidden rounded-3xl bg-transparent">
           {/* hace el cuadro siempre cuadrado y evita saltos */}
           <div className="relative aspect-square w-full">
-            {selectedVariant?.imagePublicId ? (
+            {mounted && selectedVariant?.imagePublicId ? (
               <CldImage
                 src={selectedVariant.imagePublicId}
                 alt={product.name}
@@ -33,6 +113,10 @@ export default function ProductDetailClient({
                 sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-contain p-6 sm:p-8 md:p-10"
               />
+            ) : !mounted ? (
+              <div className="flex h-full w-full items-center justify-center bg-slate-100 rounded-xl">
+                <span className="text-slate-400 text-sm">Cargando...</span>
+              </div>
             ) : (
               <Image
                 src={`https://placehold.co/800x800?text=${encodeURIComponent(product.name)}`}
@@ -45,7 +129,7 @@ export default function ProductDetailClient({
           </div>
         </div>
 
-        {variantsWithImage.length > 1 && (
+        {mounted && variantsWithImage.length > 1 && (
           <div className="grid grid-cols-4 gap-3">
             {variantsWithImage.map((variant) => (
               <button
@@ -73,7 +157,14 @@ export default function ProductDetailClient({
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <span className="badge bg-moss/10 text-moss">{product.category}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="badge bg-moss/10 text-moss">{product.category}</span>
+            {hasPromotion ? (
+              <span className="badge bg-coral/10 text-coral">
+                {promotionLabel ?? "Promo activa"}
+              </span>
+            ) : null}
+          </div>
           <h1 className="text-3xl font-semibold text-ink">{product.name}</h1>
           <p className="text-sm text-slate-500">{product.brand}</p>
         </div>
@@ -96,61 +187,93 @@ export default function ProductDetailClient({
                     : "border-cloud bg-white text-ink"
                 }`}
               >
-                {variant.color} · {variant.ram} · {variant.storage}
+                {formatVariantLabel(variant)}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-semibold text-ink">
-            ${selectedVariant.price.toLocaleString("es-AR")}
-          </span>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            {hasPromotion &&
+            product.activePromotionType !== 4 &&
+            discountedPrice < selectedVariant.price ? (
+              <>
+                <span className="text-xs text-slate-400 line-through" suppressHydrationWarning>
+                  ${selectedVariant.price.toLocaleString("es-AR")}
+                </span>
+                <span className="text-2xl font-semibold text-ink" suppressHydrationWarning>
+                  ${discountedPrice.toLocaleString("es-AR")}
+                </span>
+              </>
+            ) : (
+              <span className="text-2xl font-semibold text-ink" suppressHydrationWarning>
+                ${selectedVariant.price.toLocaleString("es-AR")}
+              </span>
+            )}
+          </div>
           <span className="text-xs font-semibold text-slate-500">
             Stock disponible:{" "}
             {selectedVariant.stockActual - selectedVariant.stockReserved}
           </span>
         </div>
+        {hasPromotion && product.activePromotionType === 4 ? (
+          <p className="text-xs text-slate-500">
+            Promoción 2x1 activa. Llevás 2 y pagás 1 en el checkout.
+          </p>
+        ) : null}
 
         <div className="flex items-center gap-4">
           <input
             type="number"
-            min={1}
+            min={availableStock > 0 ? 1 : 0}
+            max={availableStock}
             value={quantity}
-            onChange={(event) => setQuantity(Number(event.target.value))}
+            onChange={(event) =>
+              setQuantity(
+                Math.max(
+                  availableStock > 0 ? 1 : 0,
+                  Math.min(availableStock, Number(event.target.value)),
+                ),
+              )
+            }
             className="w-20 rounded-2xl border border-cloud px-3 py-2 text-center"
           />
           <button
             type="button"
-            className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
+            disabled={availableStock <= 0 || quantity <= 0}
+            className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
             onClick={() => {
+              if (availableStock <= 0 || quantity <= 0) {
+                return;
+              }
+              const shouldApplyDiscount =
+                hasPromotion &&
+                product.activePromotionType !== 4 &&
+                discountedPrice < selectedVariant.price;
+              const finalPrice = shouldApplyDiscount
+                ? discountedPrice
+                : selectedVariant.price;
               addItem({
                 id: product.id,
                 name: product.name,
                 slug: product.slug,
                 variantId: selectedVariant.id,
-                variantLabel: `${selectedVariant.color} / ${selectedVariant.ram} / ${selectedVariant.storage}`,
-                price: selectedVariant.price,
-                quantity,
+                variantLabel: formatVariantLabel(selectedVariant, " / "),
+                price: finalPrice,
+                originalPrice: shouldApplyDiscount ? selectedVariant.price : null,
+                quantity: Math.min(quantity, availableStock),
+                stockAvailable: availableStock,
                 imagePublicId: selectedVariant.imagePublicId ?? null,
               });
-              setAdded(true);
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new Event("cart:open"));
+              }
             }}
           >
             Agregar al carrito
           </button>
         </div>
-        {added && (
-          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
-            <span>Producto agregado al carrito.</span>
-            <Link href="/carrito" className="font-semibold text-moss">
-              Ir al carrito
-            </Link>
-            <Link href="/checkout" className="font-semibold text-ink">
-              Finalizar compra
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );

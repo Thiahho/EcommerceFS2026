@@ -7,11 +7,13 @@ export type ProductCatalogItem = {
   minPrice: number;
   hasStock: boolean;
   hasActivePromotion: boolean;
+  activePromotionType: number | null;
+  activePromotionValue: number | null;
   imagePublicId: string | null;
 };
 
 export type ProductVariant = {
-  id: string;
+  id: number;
   color: string;
   ram: string;
   storage: string;
@@ -31,6 +33,9 @@ export type ProductDetail = {
   slug: string;
   category: string;
   active: boolean;
+  hasActivePromotion: boolean;
+  activePromotionType: number | null;
+  activePromotionValue: number | null;
   variants: ProductVariant[];
 };
 
@@ -41,6 +46,8 @@ export type CartItem = {
   variantId: number;
   variantLabel: string;
   price: number;
+  originalPrice?: number | null;
   quantity: number;
+  stockAvailable: number;
   imagePublicId: string | null;
 };

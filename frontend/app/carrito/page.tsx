@@ -30,9 +30,23 @@ export default function CartPage() {
                 <p className="mt-2 text-sm text-slate-600">Cantidad: {item.quantity}</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-ink">
-                  ${(item.price * item.quantity).toLocaleString('es-AR')}
-                </p>
+                {item.originalPrice && item.originalPrice > item.price ? (
+                  <>
+                    <p className="text-xs text-slate-400 line-through">
+                      $
+                      {(item.originalPrice * item.quantity).toLocaleString(
+                        'es-AR',
+                      )}
+                    </p>
+                    <p className="text-lg font-semibold text-ink">
+                      ${(item.price * item.quantity).toLocaleString('es-AR')}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-lg font-semibold text-ink">
+                    ${(item.price * item.quantity).toLocaleString('es-AR')}
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={() => removeItem(item.variantId)}
