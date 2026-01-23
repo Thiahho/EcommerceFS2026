@@ -54,6 +54,15 @@ export default function PaymentForm() {
   const mountedFields = useRef(false); // Para evitar doble renderizado en React Strict Mode
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const transactionAmount = useMemo(() => total.toFixed(2), [total]);
+  const originalTotal = useMemo(
+    () =>
+      items.reduce(
+        (sum, item) =>
+          sum + (item.originalPrice ?? item.price) * item.quantity,
+        0,
+      ),
+    [items],
+  );
 
   // 1. Crear la preferencia de Mercado Pago (Checkout Pro)
   useEffect(() => {
@@ -451,9 +460,20 @@ export default function PaymentForm() {
         <div className="flex items-center justify-between pt-4 border-t">
           <div>
             <p className="text-gray-500 text-sm">Total a pagar</p>
-            <p className="text-2xl font-bold">
-              ${total.toLocaleString("es-AR")}
-            </p>
+            {originalTotal > total ? (
+              <>
+                <p className="text-xs text-slate-400 line-through">
+                  ${originalTotal.toLocaleString("es-AR")}
+                </p>
+                <p className="text-2xl font-bold">
+                  ${total.toLocaleString("es-AR")}
+                </p>
+              </>
+            ) : (
+              <p className="text-2xl font-bold">
+                ${total.toLocaleString("es-AR")}
+              </p>
+            )}
           </div>
           <button
             type="submit"
