@@ -11,6 +11,11 @@ const catalogItems = [
     href: '/admin/productos',
   },
   {
+    title: 'Órdenes',
+    description: 'Revisa pedidos, estados de pago y descarga comprobantes.',
+    href: '/admin/ordenes',
+  },
+  {
     title: 'Categorías',
     description: 'Organiza el catálogo por categoría y slug.',
     href: '/admin/categorias',
