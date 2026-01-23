@@ -64,6 +64,7 @@ export default function ProductDetailClient({
     selectedVariant.stockActual - selectedVariant.stockReserved,
     0,
   );
+  const hasPromotion = product.activePromotionType !== null;
   const promotionLabel = getPromotionLabel(
     product.activePromotionType,
     product.activePromotionValue,
@@ -149,7 +150,7 @@ export default function ProductDetailClient({
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="badge bg-moss/10 text-moss">{product.category}</span>
-            {product.hasActivePromotion ? (
+            {hasPromotion ? (
               <span className="badge bg-coral/10 text-coral">
                 {promotionLabel ?? "Promo activa"}
               </span>
@@ -185,7 +186,7 @@ export default function ProductDetailClient({
 
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            {product.hasActivePromotion &&
+            {hasPromotion &&
             product.activePromotionType !== 4 &&
             discountedPrice < selectedVariant.price ? (
               <>
@@ -207,7 +208,7 @@ export default function ProductDetailClient({
             {selectedVariant.stockActual - selectedVariant.stockReserved}
           </span>
         </div>
-        {product.hasActivePromotion && product.activePromotionType === 4 ? (
+        {hasPromotion && product.activePromotionType === 4 ? (
           <p className="text-xs text-slate-500">
             Promoción 2x1 activa. Llevás 2 y pagás 1 en el checkout.
           </p>
