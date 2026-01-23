@@ -26,6 +26,11 @@ const catalogItems = [
     href: '/admin/variantes',
   },
   {
+    title: 'Auditar stock',
+    description: 'Consulta reservas, stock disponible y alertas por nivel.',
+    href: '/admin/stock',
+  },
+  {
     title: 'Imágenes',
     description: 'Gestiona imágenes y orden de visualización.',
     href: '/admin/imagenes',

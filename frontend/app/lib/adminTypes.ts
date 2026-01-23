@@ -68,3 +68,16 @@ export type AdminOrderDetail = {
   updatedAt: string | null;
   items: AdminOrderItem[];
 };
+
+export type AdminStockVariant = {
+  id: number;
+  productId: number;
+  productName: string;
+  sku: string;
+  color: string;
+  ram: string;
+  storage: string;
+  stockActual: number;
+  stockReserved: number;
+  active: boolean;
+};
