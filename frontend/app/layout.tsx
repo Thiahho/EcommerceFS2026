@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CartModal from './components/CartModal';
 import { Providers } from './providers/Providers';
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="mx-auto w-full max-w-6xl px-6 py-10">{children}</main>
           <Footer />
+          <CartModal />
         </Providers>
       </body>
     </html>
