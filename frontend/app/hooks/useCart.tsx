@@ -55,6 +55,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             ...entry,
             quantity: nextQuantity,
             stockAvailable: maxStock,
+            price: item.price,
+            originalPrice: item.originalPrice ?? entry.originalPrice ?? null,
           };
         });
       }
