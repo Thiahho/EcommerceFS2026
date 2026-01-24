@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const storedToken = window.localStorage.getItem('adminToken');
+    const storedToken = window.sessionStorage.getItem('adminToken');
     if (!storedToken) {
       router.push('/admin');
       return;
@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
   }, [router]);
 
   const handleLogout = () => {
-    window.localStorage.removeItem('adminToken');
+    window.sessionStorage.removeItem('adminToken');
     router.push('/admin');
   };
 

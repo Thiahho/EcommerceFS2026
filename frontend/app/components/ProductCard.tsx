@@ -72,7 +72,7 @@ export default function ProductCard({
 
   return (
     <article className="group flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-soft transition hover:-translate-y-1">
-      <div className="object-contain p-2">
+      <div className="flex items-center justify-center p-2">
         {mounted && product.imagePublicId ? (
           <CldImage
             src={product.imagePublicId}

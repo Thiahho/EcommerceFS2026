@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { fetchCatalog } from './lib/api';
-import ProductCard from './components/ProductCard';
-import { ProductCatalogItem } from './lib/types';
+import Link from "next/link";
+import { fetchCatalog } from "./lib/api";
+import ProductCard from "./components/ProductCard";
+import { ProductCatalogItem } from "./lib/types";
 
 export default async function HomePage() {
   const fallbackProducts: ProductCatalogItem[] = [
@@ -16,7 +16,7 @@ export default async function HomePage() {
       hasActivePromotion: true,
       activePromotionType: 1,
       activePromotionValue: 15,
-      imagePublicId: null
+      imagePublicId: null,
     },
     {
       id: 2,
@@ -29,7 +29,7 @@ export default async function HomePage() {
       hasActivePromotion: false,
       activePromotionType: null,
       activePromotionValue: null,
-      imagePublicId: null
+      imagePublicId: null,
     },
     {
       id: 3,
@@ -42,8 +42,8 @@ export default async function HomePage() {
       hasActivePromotion: true,
       activePromotionType: 1,
       activePromotionValue: 10,
-      imagePublicId: null
-    }
+      imagePublicId: null,
+    },
   ];
 
   let products: ProductCatalogItem[] = [];
@@ -53,25 +53,29 @@ export default async function HomePage() {
   } catch {
     products = fallbackProducts;
   }
-  const promos = products.filter((product) => product.hasActivePromotion).slice(0, 3);
+  const promos = products
+    .filter((product) => product.hasActivePromotion)
+    .slice(0, 3);
   const highlighted = promos.length ? promos : products.slice(0, 3);
-  const categories = Array.from(new Set(products.map((product) => product.category))).slice(0, 4);
+  const categories = Array.from(
+    new Set(products.map((product) => product.category)),
+  ).slice(0, 4);
   const reviews = [
     {
       name: "Gabriel",
       title: "Totalmente recomendado",
-      text: "La navegación es clara y el proceso de compra es rápido. Los productos llegaron impecables."
+      text: "La navegación es clara y el proceso de compra es rápido. Los productos llegaron impecables.",
     },
     {
       name: "Anya",
       title: "Experiencia premium",
-      text: "El soporte respondió enseguida y el envío fue más veloz de lo esperado. Muy conforme."
+      text: "El soporte respondió enseguida y el envío fue más veloz de lo esperado. Muy conforme.",
     },
     {
       name: "Luke",
       title: "Calidad real",
-      text: "La calidad del producto superó lo que esperaba. Todo muy bien presentado."
-    }
+      text: "La calidad del producto superó lo que esperaba. Todo muy bien presentado.",
+    },
   ];
 
   return (
@@ -83,7 +87,8 @@ export default async function HomePage() {
             Tecnología premium para un setup impecable.
           </h1>
           <p className="text-lg text-slate-600">
-            Catálogo curado de smartphones, notebooks y audio con asesoría experta, envíos rápidos y stock real.
+            Catálogo curado de smartphones, notebooks y audio con asesoría
+            experta, envíos rápidos y stock real.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -127,42 +132,75 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        {highlighted.map((product) => (
-          <div key={product.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span className="font-semibold uppercase tracking-wide text-slate-700">Best seller</span>
-              {product.hasActivePromotion && (
-                <span className="rounded-full bg-ink px-3 py-1 text-[10px] font-semibold text-white">
-                  {product.activePromotionValue ? `${product.activePromotionValue}% OFF` : "Promo"}
-                </span>
-              )}
-            </div>
-            <h3 className="mt-4 text-lg font-semibold text-ink">{product.name}</h3>
-            <p className="mt-2 text-sm text-slate-500">{product.brand}</p>
-            <Link
-              href={`/producto/${product.slug}`}
-              className="mt-6 inline-flex items-center text-sm font-semibold text-ink"
-            >
-              Ver detalle →
-            </Link>
-          </div>
-        ))}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="section-title">LO MÁS COMPRADO</h2>
+          <Link
+            href="/catalogo"
+            className="text-sm font-semibold text-slate-700"
+          >
+            Ver todo
+          </Link>
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          {highlighted.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-6 md:grid-cols-4">
         {categories.map((category) => (
           <div key={category} className="card">
             <h3 className="text-lg font-semibold text-ink">{category}</h3>
-            <p className="mt-2 text-sm text-slate-500">Curado para alto rendimiento.</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Curado para alto rendimiento.
+            </p>
           </div>
         ))}
+      </section>
+
+      <section className="grid gap-8 rounded-[32px] bg-gradient-to-br from-ink via-slate-800 to-slate-900 p-8 md:grid-cols-2 md:p-12">
+        <div className="flex items-center justify-center">
+          <div className="relative w-full max-w-md overflow-hidden rounded-[24px] shadow-2xl">
+            <video
+              className="h-full w-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <source src="/notebook.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+        <div className="flex flex-col justify-center space-y-6 text-white">
+          <span className="badge w-fit bg-white/10 text-white">Notebooks</span>
+          <h2 className="text-3xl font-semibold md:text-4xl">
+            Potencia para crear sin límites.
+          </h2>
+          <p className="text-lg text-slate-300">
+            Notebooks de última generación con procesadores de alto rendimiento,
+            pantallas de alta resolución y diseño ultraportátil.
+          </p>
+          <div>
+            <Link
+              href="/catalogo?category=Notebooks"
+              className="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-slate-100"
+            >
+              Explorar notebooks
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="section-title">Productos en tendencia</h2>
-          <Link href="/catalogo" className="text-sm font-semibold text-slate-700">
+          <Link
+            href="/catalogo"
+            className="text-sm font-semibold text-slate-700"
+          >
             Ver todo
           </Link>
         </div>
@@ -175,7 +213,7 @@ export default async function HomePage() {
 
       <section className="rounded-[32px] bg-white p-8 shadow-soft md:p-12">
         <div className="flex items-center justify-between">
-          <h2 className="section-title">Customer reviews</h2>
+          <h2 className="section-title">Comentarios de clientes</h2>
           <span className="text-sm text-slate-500">Opiniones recientes</span>
         </div>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
@@ -188,7 +226,9 @@ export default async function HomePage() {
                 <span className="font-semibold text-ink">{review.name}</span>
                 <span>★★★★★</span>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-ink">{review.title}</h3>
+              <h3 className="mt-4 text-lg font-semibold text-ink">
+                {review.title}
+              </h3>
               <p className="mt-3 text-sm text-slate-600">{review.text}</p>
             </article>
           ))}

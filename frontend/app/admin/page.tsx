@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    const storedToken = window.localStorage.getItem('adminToken');
+    const storedToken = window.sessionStorage.getItem('adminToken');
     if (storedToken) {
       router.push('/admin/dashboard');
     }
@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
       }
 
       const data = (await response.json()) as { token: string };
-      window.localStorage.setItem('adminToken', data.token);
+      window.sessionStorage.setItem('adminToken', data.token);
       router.push('/admin/dashboard');
     } catch (requestError) {
       setError('No se pudo conectar con el servidor.');

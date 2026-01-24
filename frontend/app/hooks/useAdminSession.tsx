@@ -18,7 +18,7 @@ export function useAdminSession(): AdminSessionState {
       return;
     }
 
-    const storedToken = window.localStorage.getItem('adminToken');
+    const storedToken = window.sessionStorage.getItem('adminToken');
     if (!storedToken) {
       router.push('/admin');
       setIsLoading(false);
